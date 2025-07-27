@@ -85,6 +85,10 @@ public class CloudFoundryOperationsFactory {
         return operationsCache.size();
     }
 
+    public String getDefaultSpace() {
+        return defaultSpace;
+    }
+
     private CloudFoundryOperations createOperations(String organization, String space) {
         return DefaultCloudFoundryOperations.builder()
                 .cloudFoundryClient(cloudFoundryClient)
