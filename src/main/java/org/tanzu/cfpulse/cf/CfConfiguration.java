@@ -57,19 +57,5 @@ public class CfConfiguration {
                 .build();
     }
 
-    @Bean
-    DefaultCloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
-                                                         DopplerClient dopplerClient,
-                                                         UaaClient uaaClient,
-                                                         @Value("${cf.organization}") String organization,
-                                                         @Value("${cf.space}") String space) {
-        return DefaultCloudFoundryOperations.builder()
-                .cloudFoundryClient(cloudFoundryClient)
-                .dopplerClient(dopplerClient)
-                .uaaClient(uaaClient)
-                .organization(organization)
-                .space(space)
-                .build();
-    }
 }
 
