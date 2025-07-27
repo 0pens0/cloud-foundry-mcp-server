@@ -27,9 +27,9 @@ public class CfService {
     /*
         Applications
     */
-    private static final String APPLICATION_LIST = "Return the applications (apps) in a Cloud Foundry space. If no organization or space is specified, uses the default context.";
-    private static final String ORG_PARAM = "Name of the Cloud Foundry organization (optional, uses default if not specified)";
-    private static final String SPACE_PARAM = "Name of the Cloud Foundry space (optional, uses default if not specified)";
+    private static final String APPLICATION_LIST = "Return the applications (apps) in a Cloud Foundry space. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
+    private static final String ORG_PARAM = "Name of the Cloud Foundry organization. Optional - can be null or omitted to use the configured default organization.";
+    private static final String SPACE_PARAM = "Name of the Cloud Foundry space. Optional - can be null or omitted to use the configured default space.";
 
     @Tool(description = APPLICATION_LIST)
     public List<ApplicationSummary> applicationsList(
@@ -38,7 +38,7 @@ public class CfService {
         return getOperations(organization, space).applications().list().collectList().block();
     }
 
-    private static final String APPLICATION_DETAILS = "Gets detailed information about a Cloud Foundry application. If no organization or space is specified, uses the default context.";
+    private static final String APPLICATION_DETAILS = "Gets detailed information about a Cloud Foundry application. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
 
     @Tool(description = APPLICATION_DETAILS)
     public ApplicationDetail applicationDetails(
@@ -50,7 +50,7 @@ public class CfService {
     }
 
 
-    private static final String PUSH_APPLICATION = "Push an application JAR file to a Cloud Foundry space. If no organization or space is specified, uses the default context.";
+    private static final String PUSH_APPLICATION = "Push an application JAR file to a Cloud Foundry space. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
     private static final String NAME_PARAM = "Name of the Cloud Foundry application";
     private static final String PATH_PARAM = "Fully qualified directory pathname to the compiled JAR file for the application";
     private static final String NO_START_PARAM = "Set this flag to true if you want to explicitly prevent the app from starting after being pushed.";
@@ -87,7 +87,7 @@ public class CfService {
         }
     }
 
-    private static final String SCALE_APPLICATION = "Scale the number of instances, memory, or disk size of an application. If no organization or space is specified, uses the default context.";
+    private static final String SCALE_APPLICATION = "Scale the number of instances, memory, or disk size of an application. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
     private static final String INSTANCES_PARAM = "The new number of instances of the Cloud Foundry application";
     private static final String MEMORY_PARAM = "The memory limit, in megabytes, of the Cloud Foundry application";
     private static final String DISK_PARAM = "The disk size, in megabytes, of the Cloud Foundry application";
@@ -108,7 +108,7 @@ public class CfService {
         getOperations(organization, space).applications().scale(scaleApplicationRequest).block();
     }
 
-    private static final String START_APPLICATION = "Start a Cloud Foundry application. If no organization or space is specified, uses the default context.";
+    private static final String START_APPLICATION = "Start a Cloud Foundry application. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
 
     @Tool(description = START_APPLICATION)
     public void startApplication(@ToolParam(description = NAME_PARAM) String applicationName,
@@ -120,7 +120,7 @@ public class CfService {
         getOperations(organization, space).applications().start(startApplicationRequest).block();
     }
 
-    private static final String STOP_APPLICATION = "Stop a running Cloud Foundry application. If no organization or space is specified, uses the default context.";
+    private static final String STOP_APPLICATION = "Stop a running Cloud Foundry application. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
 
     @Tool(description = STOP_APPLICATION)
     public void stopApplication(@ToolParam(description = NAME_PARAM) String applicationName,
@@ -132,7 +132,7 @@ public class CfService {
         getOperations(organization, space).applications().stop(stopApplicationRequest).block();
     }
 
-    private static final String RESTART_APPLICATION = "Restart a running Cloud Foundry application. If no organization or space is specified, uses the default context.";
+    private static final String RESTART_APPLICATION = "Restart a running Cloud Foundry application. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
 
     @Tool(description = RESTART_APPLICATION)
     public void restartApplication(@ToolParam(description = NAME_PARAM) String applicationName,
@@ -142,7 +142,7 @@ public class CfService {
         getOperations(organization, space).applications().restart(request).block();
     }
 
-    private static final String DELETE_APPLICATION = "Delete a Cloud Foundry application. If no organization or space is specified, uses the default context.";
+    private static final String DELETE_APPLICATION = "Delete a Cloud Foundry application. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
 
     @Tool(description = DELETE_APPLICATION)
     public void deleteApplication(@ToolParam(description = NAME_PARAM) String applicationName,
@@ -167,7 +167,7 @@ public class CfService {
     /*
         Services
      */
-    private static final String SERVICE_INSTANCE_LIST = "Return the service instances (SIs) in a Cloud Foundry space. If no organization or space is specified, uses the default context.";
+    private static final String SERVICE_INSTANCE_LIST = "Return the service instances (SIs) in a Cloud Foundry space. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
 
     @Tool(description = SERVICE_INSTANCE_LIST)
     public List<ServiceInstanceSummary> serviceInstancesList(
@@ -176,7 +176,7 @@ public class CfService {
         return getOperations(organization, space).services().listInstances().collectList().block();
     }
 
-    private static final String SERVICE_INSTANCE_DETAIL = "Get detailed information about a service instance in a Cloud Foundry space. If no organization or space is specified, uses the default context.";
+    private static final String SERVICE_INSTANCE_DETAIL = "Get detailed information about a service instance in a Cloud Foundry space. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
 
     @Tool(description = SERVICE_INSTANCE_DETAIL)
     public ServiceInstance serviceInstanceDetails(
@@ -187,7 +187,7 @@ public class CfService {
         return getOperations(organization, space).services().getInstance(request).block();
     }
 
-    private static final String SERVICE_OFFERINGS_LIST = "Return the service offerings available in the Cloud Foundry marketplace. If no organization or space is specified, uses the default context.";
+    private static final String SERVICE_OFFERINGS_LIST = "Return the service offerings available in the Cloud Foundry marketplace. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
 
     @Tool(description = SERVICE_OFFERINGS_LIST)
     public List<ServiceOffering> serviceOfferingsList(
@@ -197,7 +197,7 @@ public class CfService {
         return getOperations(organization, space).services().listServiceOfferings(request).collectList().block();
     }
 
-    private static final String BIND_SERVICE_INSTANCE = "Bind a service instance to a Cloud Foundry application. If no organization or space is specified, uses the default context.";
+    private static final String BIND_SERVICE_INSTANCE = "Bind a service instance to a Cloud Foundry application. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
     private static final String SI_NAME_PARAM = "Name of the Cloud Foundry service instance";
 
     @Tool(description = BIND_SERVICE_INSTANCE)
@@ -212,7 +212,7 @@ public class CfService {
         getOperations(organization, space).services().bind(request).block();
     }
 
-    private static final String UNBIND_SERVICE_INSTANCE = "Unbind a service instance from a Cloud Foundry application. If no organization or space is specified, uses the default context.";
+    private static final String UNBIND_SERVICE_INSTANCE = "Unbind a service instance from a Cloud Foundry application. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
 
     @Tool(description = UNBIND_SERVICE_INSTANCE)
     public void unbindServiceInstance(@ToolParam(description = SI_NAME_PARAM) String serviceInstanceName,
@@ -226,7 +226,7 @@ public class CfService {
         getOperations(organization, space).services().unbind(request).block();
     }
 
-    private static final String DELETE_SERVICE_INSTANCE = "Delete a Cloud Foundry service instance. If no organization or space is specified, uses the default context.";
+    private static final String DELETE_SERVICE_INSTANCE = "Delete a Cloud Foundry service instance. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
 
     @Tool(description = DELETE_SERVICE_INSTANCE)
     public void deleteServiceInstance(@ToolParam(description = SI_NAME_PARAM) String serviceInstanceName,
@@ -241,7 +241,7 @@ public class CfService {
     /*
         Spaces
      */
-    private static final String SPACE_LIST = "Returns the spaces in a Cloud Foundry organization (org). If no organization is specified, uses the default organization.";
+    private static final String SPACE_LIST = "Returns the spaces in a Cloud Foundry organization (org). Organization parameter is optional - if not provided or null, the configured default organization will be used automatically.";
 
     @Tool(description = SPACE_LIST)
     public List<SpaceSummary> spacesList(
@@ -249,7 +249,7 @@ public class CfService {
         return getOperations(organization, null).spaces().list().collectList().block();
     }
 
-    private static final String GET_SPACE_QUOTA = "Returns a quota (set of resource limits) scoped to a Cloud Foundry space. If no organization is specified, uses the default organization.";
+    private static final String GET_SPACE_QUOTA = "Returns a quota (set of resource limits) scoped to a Cloud Foundry space. Organization parameter is optional - if not provided or null, the configured default organization will be used automatically.";
     private static final String SPACE_QUOTA_NAME_PARAM = "Name of the Cloud Foundry space quota";
 
     @Tool(description = GET_SPACE_QUOTA)
