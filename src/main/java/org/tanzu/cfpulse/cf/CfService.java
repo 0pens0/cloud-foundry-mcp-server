@@ -1,18 +1,20 @@
 package org.tanzu.cfpulse.cf;
 
 import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
 import org.cloudfoundry.operations.applications.*;
+import org.cloudfoundry.operations.networkpolicies.AddNetworkPolicyRequest;
+import org.cloudfoundry.operations.networkpolicies.ListNetworkPoliciesRequest;
+import org.cloudfoundry.operations.networkpolicies.Policy;
+import org.cloudfoundry.operations.networkpolicies.RemoveNetworkPolicyRequest;
 import org.cloudfoundry.operations.organizations.OrganizationSummary;
-import org.cloudfoundry.operations.services.*;
 import org.cloudfoundry.operations.routes.*;
+import org.cloudfoundry.operations.services.*;
 import org.cloudfoundry.operations.spaceadmin.GetSpaceQuotaRequest;
 import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
-import org.cloudfoundry.operations.spaces.SpaceSummary;
 import org.cloudfoundry.operations.spaces.CreateSpaceRequest;
 import org.cloudfoundry.operations.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.operations.spaces.RenameSpaceRequest;
-import org.cloudfoundry.operations.networkpolicies.*;
+import org.cloudfoundry.operations.spaces.SpaceSummary;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
