@@ -2,6 +2,7 @@ package org.tanzu.cfpulse.cf;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
 import org.cloudfoundry.uaa.UaaClient;
@@ -21,6 +22,7 @@ public class CloudFoundryOperationsFactory {
     private final CloudFoundryClient cloudFoundryClient;
     private final DopplerClient dopplerClient;
     private final UaaClient uaaClient;
+    private final NetworkingClient networkingClient;
     private final String defaultOrganization;
     private final String defaultSpace;
     
@@ -30,11 +32,13 @@ public class CloudFoundryOperationsFactory {
     public CloudFoundryOperationsFactory(CloudFoundryClient cloudFoundryClient,
                                        DopplerClient dopplerClient,
                                        UaaClient uaaClient,
+                                       NetworkingClient networkingClient,
                                        @Value("${cf.organization}") String defaultOrganization,
                                        @Value("${cf.space}") String defaultSpace) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.dopplerClient = dopplerClient;
         this.uaaClient = uaaClient;
+        this.networkingClient = networkingClient;
         this.defaultOrganization = defaultOrganization;
         this.defaultSpace = defaultSpace;
         this.operationsCache = new ConcurrentHashMap<>();
@@ -94,6 +98,7 @@ public class CloudFoundryOperationsFactory {
                 .cloudFoundryClient(cloudFoundryClient)
                 .dopplerClient(dopplerClient)
                 .uaaClient(uaaClient)
+                .networkingClient(networkingClient)
                 .organization(organization)
                 .space(space)
                 .build();

@@ -9,6 +9,10 @@ import org.cloudfoundry.operations.routes.*;
 import org.cloudfoundry.operations.spaceadmin.GetSpaceQuotaRequest;
 import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
 import org.cloudfoundry.operations.spaces.SpaceSummary;
+import org.cloudfoundry.operations.spaces.CreateSpaceRequest;
+import org.cloudfoundry.operations.spaces.DeleteSpaceRequest;
+import org.cloudfoundry.operations.spaces.RenameSpaceRequest;
+import org.cloudfoundry.operations.networkpolicies.*;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
@@ -260,6 +264,48 @@ public class CfService {
         return getOperations(organization, null).spaceAdmin().get(request).block();
     }
 
+    private static final String CREATE_SPACE = "Create a new Cloud Foundry space in an organization. Organization parameter is optional - if not provided or null, the configured default organization will be used automatically.";
+    private static final String SPACE_NAME_PARAM = "Name of the Cloud Foundry space";
+    private static final String SPACE_QUOTA_PARAM = "Name of the space quota to apply to the new space (optional)";
+
+    @Tool(description = CREATE_SPACE)
+    public void createSpace(@ToolParam(description = SPACE_NAME_PARAM) String spaceName,
+                           @ToolParam(description = ORG_PARAM, required = false) String organization,
+                           @ToolParam(description = SPACE_QUOTA_PARAM, required = false) String spaceQuota) {
+        CreateSpaceRequest.Builder builder = CreateSpaceRequest.builder().name(spaceName);
+        if (organization != null) {
+            builder.organization(organization);
+        }
+        if (spaceQuota != null) {
+            builder.spaceQuota(spaceQuota);
+        }
+        CreateSpaceRequest request = builder.build();
+        getOperations(organization, null).spaces().create(request).block();
+    }
+
+    private static final String DELETE_SPACE = "Delete a Cloud Foundry space. Organization parameter is optional - if not provided or null, the configured default organization will be used automatically.";
+
+    @Tool(description = DELETE_SPACE)
+    public void deleteSpace(@ToolParam(description = SPACE_NAME_PARAM) String spaceName,
+                           @ToolParam(description = ORG_PARAM, required = false) String organization) {
+        DeleteSpaceRequest request = DeleteSpaceRequest.builder().name(spaceName).build();
+        getOperations(organization, null).spaces().delete(request).block();
+    }
+
+    private static final String RENAME_SPACE = "Rename a Cloud Foundry space. Organization parameter is optional - if not provided or null, the configured default organization will be used automatically.";
+    private static final String NEW_SPACE_NAME_PARAM = "New name for the Cloud Foundry space";
+
+    @Tool(description = RENAME_SPACE)
+    public void renameSpace(@ToolParam(description = SPACE_NAME_PARAM) String currentSpaceName,
+                           @ToolParam(description = NEW_SPACE_NAME_PARAM) String newSpaceName,
+                           @ToolParam(description = ORG_PARAM, required = false) String organization) {
+        RenameSpaceRequest request = RenameSpaceRequest.builder()
+                .name(currentSpaceName)
+                .newName(newSpaceName)
+                .build();
+        getOperations(organization, null).spaces().rename(request).block();
+    }
+
     /*
         Routes
      */
@@ -370,6 +416,70 @@ public class CfService {
         
         UnmapRouteRequest request = builder.build();
         getOperations(organization, space).routes().unmap(request).block();
+    }
+
+    /*
+        Network Policies
+     */
+    private static final String ADD_NETWORK_POLICY = "Add a network policy to allow communication between applications. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
+    private static final String SOURCE_APP_PARAM = "Name of the source application that will initiate the network connection";
+    private static final String DEST_APP_PARAM = "Name of the destination application that will receive the network connection";
+    private static final String PROTOCOL_PARAM = "Network protocol for the policy (tcp or udp)";
+    private static final String PORTS_PARAM = "Port or port range for the policy (e.g., '8080' or '8080-8090')";
+
+    @Tool(description = ADD_NETWORK_POLICY)
+    public void addNetworkPolicy(@ToolParam(description = SOURCE_APP_PARAM) String sourceApp,
+                                @ToolParam(description = DEST_APP_PARAM) String destinationApp,
+                                @ToolParam(description = PROTOCOL_PARAM) String protocol,
+                                @ToolParam(description = PORTS_PARAM) String ports,
+                                @ToolParam(description = ORG_PARAM, required = false) String organization,
+                                @ToolParam(description = SPACE_PARAM, required = false) String space) {
+        // Parse port range
+        String[] portParts = ports.split("-");
+        Integer startPort = Integer.parseInt(portParts[0]);
+        Integer endPort = portParts.length > 1 ? Integer.parseInt(portParts[1]) : null;
+        
+        AddNetworkPolicyRequest request = AddNetworkPolicyRequest.builder()
+                .source(sourceApp)
+                .destination(destinationApp)
+                .protocol(protocol)
+                .startPort(startPort)
+                .endPort(endPort)
+                .build();
+        getOperations(organization, space).networkPolicies().add(request).blockLast();
+    }
+
+    private static final String LIST_NETWORK_POLICIES = "List network policies in a Cloud Foundry space. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
+
+    @Tool(description = LIST_NETWORK_POLICIES)
+    public List<Policy> listNetworkPolicies(@ToolParam(description = ORG_PARAM, required = false) String organization,
+                                           @ToolParam(description = SPACE_PARAM, required = false) String space) {
+        ListNetworkPoliciesRequest request = ListNetworkPoliciesRequest.builder().build();
+        return getOperations(organization, space).networkPolicies().list(request).collectList().block();
+    }
+
+    private static final String REMOVE_NETWORK_POLICY = "Remove a network policy between applications. Organization and space parameters are optional - if not provided or null, the configured default org/space will be used automatically.";
+
+    @Tool(description = REMOVE_NETWORK_POLICY)
+    public void removeNetworkPolicy(@ToolParam(description = SOURCE_APP_PARAM) String sourceApp,
+                                   @ToolParam(description = DEST_APP_PARAM) String destinationApp,
+                                   @ToolParam(description = PROTOCOL_PARAM) String protocol,
+                                   @ToolParam(description = PORTS_PARAM) String ports,
+                                   @ToolParam(description = ORG_PARAM, required = false) String organization,
+                                   @ToolParam(description = SPACE_PARAM, required = false) String space) {
+        // Parse port range
+        String[] portParts = ports.split("-");
+        Integer startPort = Integer.parseInt(portParts[0]);
+        Integer endPort = portParts.length > 1 ? Integer.parseInt(portParts[1]) : null;
+        
+        RemoveNetworkPolicyRequest request = RemoveNetworkPolicyRequest.builder()
+                .source(sourceApp)
+                .destination(destinationApp)
+                .protocol(protocol)
+                .startPort(startPort)
+                .endPort(endPort)
+                .build();
+        getOperations(organization, space).networkPolicies().remove(request).blockLast();
     }
 
     /**
