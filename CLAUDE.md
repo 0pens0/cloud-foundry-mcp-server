@@ -16,28 +16,39 @@ This is a Spring AI MCP (Model Context Protocol) server that enables LLMs to int
 ### Key Components
 
 - `CfPulseMcpApplication.java`: Standard Spring Boot main class
-- `McpServerConfig.java`: Registers the CF service tools with the MCP server using Spring AI's ToolCallbacks
-- `CfService.java`: Core service containing all CF operations exposed as @Tool annotated methods
+- `McpServerConfig.java`: Registers all CF service tools with the MCP server using Spring AI's ToolCallbacks
 - `CfConfiguration.java`: Spring configuration for CF client beans (CloudFoundryClient, UaaClient, etc.)
 - `CloudFoundryOperationsFactory.java`: Factory for creating CloudFoundryOperations with caching and context switching
 
+### Service Architecture
+
+The CF operations are organized into focused service classes that extend `CfBaseService`:
+
+- `CfBaseService.java`: Abstract base class providing common functionality and shared constants
+- `CfApplicationService.java`: Application lifecycle management (8 tools)
+- `CfOrganizationService.java`: Organization operations (2 tools) 
+- `CfServiceInstanceService.java`: Service instance management (6 tools)
+- `CfSpaceService.java`: Space administration (5 tools)
+- `CfRouteService.java`: Route management (6 tools)
+- `CfNetworkPolicyService.java`: Network policy configuration (3 tools)
+
 ### Architecture Details
 
+- **Modular Design**: Each service class handles one CF resource type for better maintainability
+- **Shared Base Class**: `CfBaseService` provides common `getOperations()` method and parameter constants
 - **Context Switching**: The factory supports switching between different org/space contexts while maintaining a cache of CloudFoundryOperations instances
 - **Parameter Resolution**: All tools accept optional organization and space parameters that fall back to configured defaults
 - **Reactive Patterns**: Uses reactive CF client with `.block()` calls to provide synchronous tool interfaces
-- **Tool Registration**: Spring AI's MCP server automatically discovers and exposes all @Tool annotated methods
+- **Automatic Registration**: Spring AI's MCP server automatically discovers and exposes all @Tool annotated methods from all service classes
 
-### Tool Categories
+### Tool Categories by Service
 
-The `CfService` exposes tools organized by CF resource type:
-
-- **Applications**: List, get details, push, scale, start/stop/restart, delete
-- **Organizations**: List orgs
-- **Services**: List instances/offerings, bind/unbind, delete instances  
-- **Spaces**: List spaces, get quotas, create, delete, rename
-- **Routes**: List, create, delete, map/unmap to applications, delete orphaned routes
-- **Network Policies**: Add, list, remove policies between applications
+- **CfApplicationService**: List apps, get details, push, scale, start, stop, restart, delete (8 tools)
+- **CfOrganizationService**: List organizations, get organization details (2 tools)
+- **CfServiceInstanceService**: List instances/offerings, get details, bind, unbind, delete instances (6 tools)
+- **CfSpaceService**: List spaces, get quotas, create, delete, rename spaces (5 tools)
+- **CfRouteService**: List, create, delete routes, delete orphaned routes, map/unmap to applications (6 tools)
+- **CfNetworkPolicyService**: Add, list, remove network policies between applications (3 tools)
 
 ## Development Commands
 
@@ -111,3 +122,28 @@ This server is designed to be used with MCP clients like Claude Desktop. Example
 - Spring AI 1.0.0 (MCP server support)
 - Cloud Foundry Java Client 5.12.2.RELEASE
 - Java 21 runtime requirement
+
+## Development Guidelines
+
+### Adding New Tools
+
+1. **Choose the appropriate service class** based on the CF resource type (apps, orgs, services, spaces, routes, network policies)
+2. **Add the @Tool method** to the relevant service class following existing patterns
+3. **Use shared constants** from `CfBaseService` for common parameters (ORG_PARAM, SPACE_PARAM, NAME_PARAM)
+4. **Follow naming conventions**: method names should be descriptive (e.g., `applicationsList`, `organizationDetails`)
+5. **Include parameter descriptions** using @ToolParam annotations
+6. **Use getOperations(org, space)** for context resolution - this handles default org/space fallback
+
+### Creating New Service Classes
+
+If adding a new CF resource type:
+
+1. **Extend CfBaseService** to inherit common functionality
+2. **Add @Service annotation** for Spring component scanning
+3. **Inject CloudFoundryOperationsFactory** via constructor
+4. **Register in McpServerConfig** by adding the service to the `registerTools` method parameter list
+5. **Follow the pattern** of existing service classes for consistency
+
+### Tool Registration
+
+All @Tool annotated methods are automatically discovered and registered through `McpServerConfig.registerTools()`. The method uses `ToolCallbacks.from()` to extract all tools from each service class and combines them into a single list for the MCP server.
