@@ -7,6 +7,7 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.tanzu.cfpulse.cf.*;
+import org.tanzu.cfpulse.clone.CfApplicationCloner;
 
 import java.util.List;
 
