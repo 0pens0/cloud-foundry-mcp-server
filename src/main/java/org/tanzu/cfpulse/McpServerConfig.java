@@ -23,9 +23,9 @@ public class McpServerConfig {
             CfSpaceService cfSpaceService,
             CfRouteService cfRouteService,
             CfNetworkPolicyService cfNetworkPolicyService,
-            HybridBuildpackCloner hybridBuildpackCloner) {
+            CfApplicationCloner cfApplicationCloner) {
 
         return List.of(ToolCallbacks.from(cfApplicationService, cfOrganizationService, cfServiceInstanceService,
-                cfSpaceService, cfRouteService, cfNetworkPolicyService, hybridBuildpackCloner));
+                cfSpaceService, cfRouteService, cfNetworkPolicyService, cfApplicationCloner));
     }
 }

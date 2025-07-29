@@ -31,15 +31,18 @@ The CF operations are organized into focused service classes that extend `CfBase
 - `CfSpaceService.java`: Space administration (5 tools)
 - `CfRouteService.java`: Route management (6 tools)
 - `CfNetworkPolicyService.java`: Network policy configuration (3 tools)
+- `CfApplicationCloner.java`: Advanced application cloning with buildpack-specific placeholders (1 tool)
 
 ### Architecture Details
 
 - **Modular Design**: Each service class handles one CF resource type for better maintainability
 - **Shared Base Class**: `CfBaseService` provides common `getOperations()` method and parameter constants
-- **Context Switching**: The factory supports switching between different org/space contexts while maintaining a cache of CloudFoundryOperations instances
-- **Parameter Resolution**: All tools accept optional organization and space parameters that fall back to configured defaults
+- **Multi-Context Support**: All tools accept optional organization and space parameters for dynamic targeting across environments
+- **Intelligent Caching**: `CloudFoundryOperationsFactory` maintains a thread-safe cache (ConcurrentHashMap) of CloudFoundryOperations instances keyed by "org:space"
+- **Context Resolution**: Automatic fallback to configured defaults when org/space parameters are null or omitted
 - **Reactive Patterns**: Uses reactive CF client with `.block()` calls to provide synchronous tool interfaces
 - **Automatic Registration**: Spring AI's MCP server automatically discovers and exposes all @Tool annotated methods from all service classes
+- **Advanced Cloning**: `CfApplicationCloner` provides application cloning with buildpack-specific placeholders and environment variable preservation
 
 ### Tool Categories by Service
 
@@ -49,6 +52,30 @@ The CF operations are organized into focused service classes that extend `CfBase
 - **CfSpaceService**: List spaces, get quotas, create, delete, rename spaces (5 tools)
 - **CfRouteService**: List, create, delete routes, delete orphaned routes, map/unmap to applications (6 tools)
 - **CfNetworkPolicyService**: Add, list, remove network policies between applications (3 tools)
+- **CfApplicationCloner**: Clone applications with buildpack-specific placeholders preserving configuration and environment variables (1 tool)
+
+### Multi-Context Operation Pattern
+
+All tools support optional `organization` and `space` parameters for cross-environment operations:
+
+```java
+// Use default org/space (from configuration)
+applicationsList()
+
+// Target specific space in default org
+applicationsList(null, "production")
+
+// Target specific org/space combination  
+applicationsList("my-org", "staging")
+```
+
+**Context Resolution Rules:**
+- Both null: Use configured default org/space
+- Organization null, Space provided: Use default org with specified space  
+- Organization provided, Space null: Use specified org with default space
+- Both provided: Use specified org/space combination
+
+**Caching:** The factory maintains a thread-safe cache of CloudFoundryOperations instances per org/space combination for optimal performance.
 
 ## Development Commands
 
@@ -147,3 +174,18 @@ If adding a new CF resource type:
 ### Tool Registration
 
 All @Tool annotated methods are automatically discovered and registered through `McpServerConfig.registerTools()`. The method uses `ToolCallbacks.from()` to extract all tools from each service class and combines them into a single list for the MCP server.
+
+### Special Considerations
+
+**CfApplicationCloner**: This advanced service provides application cloning using buildpack-specific placeholders:
+- Creates buildpack-specific placeholders (Java, Node.js, Python, Go, PHP, Ruby, Static)
+- Preserves source application configuration (memory, disk, instances, environment variables)
+- Guarantees buildpack consistency through pre-deployment buildpack matching
+- Includes comprehensive error handling and logging for troubleshooting
+- Supports environment variable cloning using CF's `getEnvironments()` and `setEnvironmentVariable()` APIs
+
+**Environment Variable Handling**: When working with environment variables, the system:
+- Retrieves user-provided environment variables from source applications
+- Converts CF's `Map<String, Object>` format to `Map<String, String>` for consistency
+- Sets environment variables sequentially during deployment to ensure proper configuration
+- Gracefully handles errors by returning empty maps when environment variables cannot be retrieved

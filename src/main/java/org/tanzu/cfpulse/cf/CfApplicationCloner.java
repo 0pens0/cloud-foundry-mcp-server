@@ -16,26 +16,26 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Buildpack-Matched Hybrid approach: Deploy buildpack-specific placeholder → Copy application source → Preserve buildpack
- *
- * This approach ensures perfect buildpack matching by using the same buildpack from start to finish:
- * 1. Detect source app's buildpack and configuration
- * 2. Create buildpack-specific placeholder content (Java/Node/Python/Go/PHP/Ruby/Static)
- * 3. Deploy placeholder with source app's exact buildpack (guarantees buildpack consistency)
- * 4. Copy source over placeholder (preserves buildpack, replaces content)
- * 5. Scale and start with verified buildpack matching
+ * Application cloning service that creates buildpack-specific placeholders to ensure consistent deployments.
+ * 
+ * This approach ensures buildpack consistency by:
+ * 1. Detecting source app's buildpack and configuration
+ * 2. Creating buildpack-specific placeholder content
+ * 3. Deploying placeholder with source app's exact buildpack
+ * 4. Copying source over placeholder to preserve buildpack
+ * 5. Scaling and starting with verified buildpack matching
  */
 @Service
-public class HybridBuildpackCloner extends CfBaseService {
+public class CfApplicationCloner extends CfBaseService {
 
-    public HybridBuildpackCloner(CloudFoundryOperationsFactory operationsFactory) {
+    public CfApplicationCloner(CloudFoundryOperationsFactory operationsFactory) {
         super(operationsFactory);
     }
 
     /**
-     * Clone application using fast static placeholder, then auto-detect buildpack
+     * Clone an existing Cloud Foundry application by creating a buildpack-specific placeholder
      */
-    @Tool(description = "Clone an existing Cloud Foundry application to create a copy with a new name. Uses buildpack-matched hybrid approach to ensure perfect buildpack consistency.")
+    @Tool(description = "Clone an existing Cloud Foundry application to create a copy with a new name. Uses buildpack-specific placeholders to ensure consistent deployments.")
     public void cloneApp(
             @ToolParam(description = "Source application name") String sourceApp,
             @ToolParam(description = "Target application name") String targetApp,
@@ -59,9 +59,9 @@ public class HybridBuildpackCloner extends CfBaseService {
                                          ", buildpack=" + sourceBuildpack + 
                                          ", env vars=" + config.environmentVariables().size());
                         
-                        return Mono.fromCallable(() -> createBuildpackSpecificPlaceholder(targetApp, sourceBuildpack))
+                        return Mono.fromCallable(() -> createBuildpackPlaceholder(targetApp, sourceBuildpack))
                                 .flatMap(placeholderPath -> {
-                                    System.out.println("Created buildpack-specific placeholder for: " + sourceBuildpack);
+                                    System.out.println("Created buildpack placeholder for: " + sourceBuildpack);
                                     
                                     return deployPlaceholderWithSourceBuildpack(targetApp, placeholderPath, sourceBuildpack, organization, space, config)
                                             .doOnSuccess(v -> System.out.println("Placeholder deployed with matching buildpack: " + sourceBuildpack))
@@ -88,57 +88,10 @@ public class HybridBuildpackCloner extends CfBaseService {
         }
     }
 
-    /**
-     * Clone with buildpack verification - shows the buildpack transition
-     */
-    public Mono<BuildpackTransitionResult> cloneWithBuildpackTracking(String sourceApp, String targetApp, String organization, String space) {
-        return getSourceAppConfig(sourceApp, organization, space)
-                .flatMap(config ->
-                        Mono.fromCallable(() -> createStaticPlaceholder(targetApp))
-                                .flatMap(placeholderPath ->
-                                        deployStaticPlaceholder(targetApp, placeholderPath, organization, space, config)
-                                                .then(getBuildpackInfo(targetApp, organization, space))
-                                                .flatMap(initialBuildpack ->
-                                                        copySourceWithExplicitBuildpack(sourceApp, targetApp, organization, space, config)
-                                                                .then(getBuildpackInfo(targetApp, organization, space))
-                                                                .map(finalBuildpack -> new BuildpackTransitionResult(
-                                                                        targetApp, initialBuildpack, finalBuildpack, true))
-                                                )
-                                                .doFinally(signal -> cleanup(placeholderPath))
-                                )
-                );
-    }
 
-    /**
-     * Batch clone multiple applications using hybrid approach
-     */
-    public void batchCloneApps(String organization, String space, AppCloneSpec... specs) {
-        for (AppCloneSpec spec : specs) {
-            cloneApp(spec.sourceApp(), spec.targetApp(), organization, space);
-        }
-    }
 
-    /**
-     * Clone with memory/disk optimization for applications
-     */
-    public Mono<Void> cloneAppOptimized(String sourceApp, String targetApp,
-                                            int memoryMB, int diskMB, String organization, String space) {
-        return getSourceAppConfig(sourceApp, organization, space)
-                .flatMap(config ->
-                        Mono.fromCallable(() -> createStaticPlaceholder(targetApp))
-                                .flatMap(placeholderPath ->
-                                        // Deploy static placeholder with source app resources first
-                                        deployStaticPlaceholder(targetApp, placeholderPath, organization, space, config)
-                                                .then(
-                                                        // Copy source with optimized settings  
-                                                        copySourceOptimized(sourceApp, targetApp, memoryMB, diskMB, organization, space)
-                                                )
-                                                .doFinally(signal -> cleanup(placeholderPath))
-                                )
-                );
-    }
 
-    private Path createBuildpackSpecificPlaceholder(String appName, String buildpack) {
+    private Path createBuildpackPlaceholder(String appName, String buildpack) {
         try {
             Path result = createPlaceholderForBuildpack(appName, buildpack);
             System.out.println("Created " + buildpack + " placeholder at: " + result.toAbsolutePath());
@@ -151,18 +104,6 @@ public class HybridBuildpackCloner extends CfBaseService {
         }
     }
 
-    private Path createStaticPlaceholder(String appName) {
-        try {
-            Path result = createStaticApp(appName);
-            System.out.println("Created static placeholder at: " + result.toAbsolutePath());
-            return result;
-        } catch (Exception e) {
-            System.err.println("Failed to create static placeholder for app: " + appName);
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Failed to create static placeholder for app: " + appName, e);
-        }
-    }
 
     private Path createPlaceholderForBuildpack(String appName, String buildpack) throws IOException {
         Path tempDir = Files.createTempDirectory("cf-" + buildpack.replace("_", "-") + "-" + appName);
@@ -418,77 +359,7 @@ public class HybridBuildpackCloner extends CfBaseService {
                 .then(setEnvironmentVariables(appName, config.environmentVariables(), organization, space));
     }
 
-    private Mono<Void> deployStaticPlaceholder(String appName, Path placeholderPath, String organization, String space, AppConfig config) {
-        return getOperations(organization, space).applications()
-                .push(PushApplicationRequest.builder()
-                        .name(appName)
-                        .path(placeholderPath)
-                        .noStart(true)           // Don't start static app
-                        .memory(config.memoryLimit())    // Match source app memory
-                        .diskQuota(config.diskQuota())   // Match source app disk
-                        .instances(config.instances())   // Match source app instances
-                        .buildpack("staticfile_buildpack")  // Skip buildpack detection for speed
-                        .stagingTimeout(Duration.ofMinutes(1)) // Static stages very fast
-                        .build())
-                .then(setEnvironmentVariables(appName, config.environmentVariables(), organization, space));
-    }
 
-    private Mono<Void> copySourceWithExplicitBuildpack(String sourceApp, String targetApp, String organization, String space, AppConfig config) {
-        return getBuildpackInfo(sourceApp, organization, space)
-                .doOnSuccess(buildpack -> System.out.println("Source app buildpack: " + buildpack))
-                .flatMap(sourceBuildpack ->
-                        // Step 1: Copy source over existing static placeholder
-                        // This preserves the target app while replacing contents with source artifacts
-                        getOperations(organization, space).applications()
-                                .copySource(CopySourceApplicationRequest.builder()
-                                        .name(sourceApp)
-                                        .targetName(targetApp)
-                                        .restart(false)
-                                        .stagingTimeout(Duration.ofMinutes(8))
-                                        .startupTimeout(Duration.ofMinutes(5))
-                                        .build())
-                                .doOnSuccess(v -> System.out.println("Copied source artifacts over static placeholder"))
-                                .then(
-                                        // Step 2: Scale to match source configuration  
-                                        getOperations(organization, space).applications()
-                                                .scale(ScaleApplicationRequest.builder()
-                                                        .name(targetApp)
-                                                        .memoryLimit(config.memoryLimit())
-                                                        .diskLimit(config.diskQuota())
-                                                        .instances(config.instances())
-                                                        .build())
-                                                .doOnSuccess(v -> System.out.println("Scaled app to match source configuration"))
-                                )
-                                .then(
-                                        // Step 3: Start the app - CF will detect buildpack from copied artifacts
-                                        getOperations(organization, space).applications()
-                                                .start(StartApplicationRequest.builder()
-                                                        .name(targetApp)
-                                                        .stagingTimeout(Duration.ofMinutes(8))
-                                                        .startupTimeout(Duration.ofMinutes(5))
-                                                        .build())
-                                                .doOnSuccess(v -> System.out.println("Started app - buildpack will be detected from source artifacts"))
-                                )
-                                .then(
-                                        // Step 4: CRITICAL - Verify buildpack matches source (fail if not)
-                                        getBuildpackInfo(targetApp, organization, space)
-                                                .flatMap(finalBuildpack -> {
-                                                    if (sourceBuildpack.equals(finalBuildpack)) {
-                                                        System.out.println("✓ SUCCESS: Buildpack matches source - " + finalBuildpack);
-                                                        return Mono.empty();
-                                                    } else {
-                                                        String errorMsg = String.format(
-                                                                "❌ BUILDPACK MISMATCH: Expected '%s' but got '%s'. " +
-                                                                "The source artifacts may not have been copied correctly, " +
-                                                                "or CF's buildpack detection failed to match the original app type.",
-                                                                sourceBuildpack, finalBuildpack);
-                                                        System.err.println(errorMsg);
-                                                        return Mono.error(new RuntimeException(errorMsg));
-                                                    }
-                                                })
-                                )
-                );
-    }
 
     private Mono<Void> copySourceWithBuildpackVerification(String sourceApp, String targetApp, String expectedBuildpack, String organization, String space, AppConfig config) {
         return getOperations(organization, space).applications()
@@ -540,35 +411,6 @@ public class HybridBuildpackCloner extends CfBaseService {
                 );
     }
 
-    private Mono<Void> copySourceOptimized(String sourceApp, String targetApp,
-                                               int memoryMB, int diskMB, String organization, String space) {
-        return getOperations(organization, space).applications()
-                .copySource(CopySourceApplicationRequest.builder()
-                        .name(sourceApp)
-                        .targetName(targetApp)
-                        .restart(false)          // Don't restart yet - we'll scale first
-                        .stagingTimeout(Duration.ofMinutes(8))
-                        .startupTimeout(Duration.ofMinutes(5))
-                        .build())
-                .then(
-                        // Scale to appropriate application resources before starting
-                        getOperations(organization, space).applications()
-                                .scale(ScaleApplicationRequest.builder()
-                                        .name(targetApp)
-                                        .memoryLimit(memoryMB)
-                                        .diskLimit(diskMB)
-                                        .build())
-                )
-                .then(
-                        // Now start the properly sized application
-                        getOperations(organization, space).applications()
-                                .start(StartApplicationRequest.builder()
-                                        .name(targetApp)
-                                        .stagingTimeout(Duration.ofMinutes(8))
-                                        .startupTimeout(Duration.ofMinutes(5))
-                                        .build())
-                );
-    }
 
     private Mono<String> getBuildpackInfo(String appName, String organization, String space) {
         return getOperations(organization, space).applications()
@@ -597,9 +439,6 @@ public class HybridBuildpackCloner extends CfBaseService {
                 );
     }
 
-    /**
-     * Get environment variables from an application
-     */
     private Mono<Map<String, String>> getEnvironmentVariables(String appName, String organization, String space) {
         return getOperations(organization, space).applications()
                 .getEnvironments(GetApplicationEnvironmentsRequest.builder().name(appName).build())
@@ -615,9 +454,6 @@ public class HybridBuildpackCloner extends CfBaseService {
                 .onErrorReturn(new HashMap<>()); // Return empty map if env vars cannot be retrieved
     }
 
-    /**
-     * Set environment variables for an application
-     */
     private Mono<Void> setEnvironmentVariables(String appName, Map<String, String> envVars, String organization, String space) {
         if (envVars == null || envVars.isEmpty()) {
             return Mono.empty(); // No environment variables to set
@@ -625,7 +461,7 @@ public class HybridBuildpackCloner extends CfBaseService {
         
         // Set each environment variable sequentially using reduce to chain them
         return envVars.entrySet().stream()
-                .reduce(Mono.<Void>empty(),
+                .reduce(Mono.empty(),
                         (mono, entry) -> mono.then(
                             getOperations(organization, space).applications()
                                 .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
@@ -635,97 +471,14 @@ public class HybridBuildpackCloner extends CfBaseService {
                                         .build())
                                 .doOnSuccess(v -> System.out.println("Set environment variable: " + entry.getKey() + "=" + entry.getValue()))
                         ),
-                        (m1, m2) -> m1.then(m2));
-    }
-
-    /**
-     * Advanced: Clone with buildpack hints to speed up detection
-     */
-    public Mono<Void> cloneAppWithHints(String sourceApp, String targetApp,
-                                            String appVersion, String frameworkVersion, String organization, String space) {
-        return getSourceAppConfig(sourceApp, organization, space)
-                .flatMap(config ->
-                        Mono.fromCallable(() -> createStaticPlaceholderWithHints(targetApp, appVersion))
-                                .flatMap(placeholderPath ->
-                                        deployStaticPlaceholder(targetApp, placeholderPath, organization, space, config)
-                                                .then(copySourceWithExplicitBuildpack(sourceApp, targetApp, organization, space, config))
-                                                .doFinally(signal -> cleanup(placeholderPath))
-                                )
-                );
-    }
-
-    private Path createStaticPlaceholderWithHints(String appName, String appVersion) {
-        try {
-            // Create placeholder with hint files that Java buildpack will recognize
-            java.nio.file.Path tempDir = java.nio.file.Files.createTempDirectory("cf-app-hint-" + appName);
-
-            // Main page
-            String html = "<h1>" + appName + "</h1><p>" + appVersion + " placeholder</p>";
-            java.nio.file.Files.writeString(tempDir.resolve("index.html"), html);
-
-            // Add empty files that help buildpack detection (examples for different languages)
-            java.nio.file.Files.writeString(tempDir.resolve("package.json"),
-                    "{\"name\": \"placeholder\", \"version\": \"1.0.0\"}");
-            java.nio.file.Files.createFile(tempDir.resolve("requirements.txt"));
-
-            // Staticfile for initial deployment
-            java.nio.file.Files.writeString(tempDir.resolve("Staticfile"), "root: .");
-
-            return tempDir;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create Java hint placeholder", e);
-        }
-    }
-
-    private Path createStaticApp(String appName) throws IOException {
-        try {
-            // Create temp directory using the system default temp directory
-            Path tempDir = Files.createTempDirectory("cf-static-app-" + appName);
-            System.out.println("Created temp directory: " + tempDir.toAbsolutePath());
-
-            // Create index.html
-            String indexContent = """
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>%s - Placeholder</title>
-                </head>
-                <body>
-                    <h1>Placeholder Application: %s</h1>
-                    <p>This is a temporary placeholder. The real application will be copied here.</p>
-                    <p>Timestamp: %s</p>
-                </body>
-                </html>
-                """.formatted(appName, appName, java.time.Instant.now());
-
-            Path indexFile = tempDir.resolve("index.html");
-            Files.writeString(indexFile, indexContent);
-            System.out.println("Created index.html: " + indexFile.toAbsolutePath());
-
-            // Create Staticfile for Cloud Foundry staticfile buildpack
-            String staticfileContent = """
-                root: .
-                directory: visible
-                """;
-
-            Path staticFile = tempDir.resolve("Staticfile");
-            Files.writeString(staticFile, staticfileContent);
-            System.out.println("Created Staticfile: " + staticFile.toAbsolutePath());
-
-            return tempDir;
-        } catch (IOException e) {
-            System.err.println("IOException while creating static app files for: " + appName);
-            System.err.println("Error details: " + e.getMessage());
-            throw e;
-        }
+                        Mono::then);
     }
 
     private void cleanup(Path tempDir) {
         if (tempDir == null) return;
 
-        try {
-            Files.walk(tempDir)
-                    .sorted(Comparator.reverseOrder()) // Critical: files before directories
+        try (var pathStream = Files.walk(tempDir)) {
+            pathStream.sorted(Comparator.reverseOrder()) // Critical: files before directories
                     .forEach(path -> {
                         try {
                             Files.deleteIfExists(path);
@@ -738,52 +491,6 @@ public class HybridBuildpackCloner extends CfBaseService {
             System.err.println("Warning: Could not traverse directory " + tempDir);
         }
     }
+
+    record AppConfig(Integer memoryLimit, Integer diskQuota, Integer instances, Map<String, String> environmentVariables) {}
 }
-
-// Supporting classes
-record AppCloneSpec(String sourceApp, String targetApp) {}
-
-record AppConfig(Integer memoryLimit, Integer diskQuota, Integer instances, Map<String, String> environmentVariables) {}
-
-record BuildpackTransitionResult(
-        String appName,
-        String initialBuildpack,  // Should be "staticfile_buildpack"
-        String finalBuildpack,    // Should be "java_buildpack" after restage
-        boolean success
-) {
-    @Override
-    public String toString() {
-        return String.format("App: %s | %s → %s | Success: %s",
-                appName, initialBuildpack, finalBuildpack, success);
-    }
-}
-
-/**
- * What happens during the hybrid cloning process:
- *
- * STEP 1 - BUILDPACK-SPECIFIC PLACEHOLDER (5-15 seconds):
- * ✓ Detect source app's buildpack (java_buildpack, nodejs_buildpack, etc.)
- * ✓ Generate appropriate placeholder content for that buildpack type
- * ✓ Deploy placeholder with source app's exact buildpack (no detection needed)
- * ✓ Fast staging using minimal but buildpack-compatible content
- * ✓ App deployed but not started (reserves name with correct buildpack)
- *
- * STEP 2 - SOURCE COPY WITH BUILDPACK PRESERVATION (60-180 seconds):
- * ✓ Copy source code over existing buildpack-matched placeholder
- * ✓ Buildpack remains unchanged (already set correctly)
- * ✓ Scale app to match source configuration (memory, disk, instances)
- * ✓ Copy environment variables from source application
- * ✓ Start app with preserved buildpack and environment
- * ✓ Verify buildpack consistency (should always match)
- * ✓ Compiles application using pre-configured buildpack
- * ✓ Starts with proper application settings and environment variables
- *
- * TOTAL TIME: ~65-195 seconds (vs 90-240s for traditional approach)
- *
- * BENEFITS:
- * - Guaranteed buildpack consistency (no auto-detection variability)
- * - Faster placeholder deployment with buildpack-specific content
- * - Works with Java, Node.js, Python, Go, PHP, Ruby, and Static apps
- * - Eliminates buildpack mismatch errors
- * - Complete source app configuration preserved (memory, disk, instances, environment variables)
- */
