@@ -11,6 +11,8 @@ import org.cloudfoundry.reactor.doppler.ReactorDopplerClient;
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.networking.NetworkingClient;
+import org.cloudfoundry.reactor.networking.ReactorNetworkingClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -58,18 +60,12 @@ public class CfConfiguration {
     }
 
     @Bean
-    DefaultCloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
-                                                         DopplerClient dopplerClient,
-                                                         UaaClient uaaClient,
-                                                         @Value("${cf.organization}") String organization,
-                                                         @Value("${cf.space}") String space) {
-        return DefaultCloudFoundryOperations.builder()
-                .cloudFoundryClient(cloudFoundryClient)
-                .dopplerClient(dopplerClient)
-                .uaaClient(uaaClient)
-                .organization(organization)
-                .space(space)
+    ReactorNetworkingClient networkingClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+        return ReactorNetworkingClient.builder()
+                .connectionContext(connectionContext)
+                .tokenProvider(tokenProvider)
                 .build();
     }
+
 }
 

@@ -6,7 +6,8 @@ import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.tanzu.cfpulse.cf.CfService;
+import org.tanzu.cfpulse.cf.*;
+import org.tanzu.cfpulse.clone.CfApplicationCloner;
 
 import java.util.List;
 
@@ -16,7 +17,16 @@ public class McpServerConfig {
     private static final Logger logger = LoggerFactory.getLogger(McpServerConfig.class);
 
     @Bean
-    public List<ToolCallback> registerTools(CfService cfService) {
-        return List.of(ToolCallbacks.from(cfService));
+    public List<ToolCallback> registerTools(
+            CfApplicationService cfApplicationService,
+            CfOrganizationService cfOrganizationService,
+            CfServiceInstanceService cfServiceInstanceService,
+            CfSpaceService cfSpaceService,
+            CfRouteService cfRouteService,
+            CfNetworkPolicyService cfNetworkPolicyService,
+            CfApplicationCloner cfApplicationCloner) {
+
+        return List.of(ToolCallbacks.from(cfApplicationService, cfOrganizationService, cfServiceInstanceService,
+                cfSpaceService, cfRouteService, cfNetworkPolicyService, cfApplicationCloner));
     }
 }
