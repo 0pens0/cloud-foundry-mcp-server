@@ -2,7 +2,22 @@
 
 A comprehensive Model Context Protocol (MCP) server that provides AI-powered access to Cloud Foundry operations through 31 specialized tools. Built with [Spring AI 1.1.0-M2](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html) and deployed on Cloud Foundry.
 
-![Sample](images/sample.png)
+![Cloud Foundry MCP Server](https://img.shields.io/badge/Cloud%20Foundry-MCP%20Server-blue?style=for-the-badge&logo=cloudfoundry)
+![Spring AI](https://img.shields.io/badge/Spring%20AI-1.1.0--M2-green?style=for-the-badge&logo=spring)
+![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.2-brightgreen?style=for-the-badge&logo=springboot)
+![MCP](https://img.shields.io/badge/MCP-Protocol-purple?style=for-the-badge)
+![SSE](https://img.shields.io/badge/Transport-SSE-yellow?style=for-the-badge)
+
+![Version](https://img.shields.io/badge/Version-0.1.0-red?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+![Maven](https://img.shields.io/badge/Maven-3.9+-red?style=for-the-badge&logo=apache-maven)
+![Cloud Foundry](https://img.shields.io/badge/Deployed%20on-Cloud%20Foundry-0066CC?style=for-the-badge&logo=cloudfoundry)
+
+<div align="center">
+  <img src="images/cf-mcp-architecture.svg" alt="Cloud Foundry MCP Server Architecture" width="600"/>
+  <p><em>Cloud Foundry MCP Server - AI-powered Cloud Foundry operations via Model Context Protocol</em></p>
+</div>
 
 ## 🚀 Quick Start
 
@@ -59,9 +74,11 @@ CF_SPACE=mcp-server
 ### Application Properties
 ```properties
 spring.ai.mcp.server.name=cloud-foundry-mcp
-spring.ai.mcp.server.version=1.0.0
+spring.ai.mcp.server.version=0.1.0
 spring.ai.mcp.server.prompt-change-notification=false
 spring.ai.mcp.server.resource-change-notification=false
+spring.ai.mcp.server.transport.type=sse
+spring.ai.mcp.server.transport.sse.path=/sse
 
 management.endpoints.web.exposure.include=health,info,mappings
 management.endpoint.health.show-details=always

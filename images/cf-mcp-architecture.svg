@@ -1,0 +1,108 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cloudGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#357ABD;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="mcpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8E44AD;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6C3483;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="springGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6DB33F;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5A9A2E;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="600" height="400" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="300" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#2c3e50">
+    Cloud Foundry MCP Server Architecture
+  </text>
+  
+  <!-- Cloud Foundry Foundation -->
+  <rect x="50" y="80" width="200" height="120" rx="10" fill="url(#cloudGradient)" stroke="#2c3e50" stroke-width="2"/>
+  <text x="150" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">
+    Cloud Foundry
+  </text>
+  <text x="150" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+    Foundation
+  </text>
+  
+  <!-- CF Components -->
+  <rect x="70" y="140" width="60" height="25" rx="5" fill="white" stroke="#2c3e50" stroke-width="1"/>
+  <text x="100" y="157" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">Apps</text>
+  
+  <rect x="140" y="140" width="60" height="25" rx="5" fill="white" stroke="#2c3e50" stroke-width="1"/>
+  <text x="170" y="157" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">Services</text>
+  
+  <rect x="70" y="170" width="60" height="25" rx="5" fill="white" stroke="#2c3e50" stroke-width="1"/>
+  <text x="100" y="187" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">Routes</text>
+  
+  <rect x="140" y="170" width="60" height="25" rx="5" fill="white" stroke="#2c3e50" stroke-width="1"/>
+  <text x="170" y="187" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">Orgs</text>
+  
+  <!-- MCP Server -->
+  <rect x="300" y="80" width="200" height="120" rx="10" fill="url(#mcpGradient)" stroke="#2c3e50" stroke-width="2"/>
+  <text x="400" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">
+    MCP Server
+  </text>
+  <text x="400" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+    (Spring AI 1.1.0-M2)
+  </text>
+  
+  <!-- MCP Tools -->
+  <rect x="320" y="140" width="60" height="25" rx="5" fill="white" stroke="#2c3e50" stroke-width="1"/>
+  <text x="350" y="157" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">31 Tools</text>
+  
+  <rect x="390" y="140" width="60" height="25" rx="5" fill="white" stroke="#2c3e50" stroke-width="1"/>
+  <text x="420" y="157" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">SSE</text>
+  
+  <rect x="320" y="170" width="60" height="25" rx="5" fill="white" stroke="#2c3e50" stroke-width="1"/>
+  <text x="350" y="187" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">Health</text>
+  
+  <rect x="390" y="170" width="60" height="25" rx="5" fill="white" stroke="#2c3e50" stroke-width="1"/>
+  <text x="420" y="187" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">Actuator</text>
+  
+  <!-- AI Client -->
+  <rect x="50" y="250" width="200" height="80" rx="10" fill="url(#springGradient)" stroke="#2c3e50" stroke-width="2"/>
+  <text x="150" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">
+    AI Client
+  </text>
+  <text x="150" y="295" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+    (Claude, ChatGPT, etc.)
+  </text>
+  
+  <rect x="70" y="305" width="60" height="20" rx="5" fill="white" stroke="#2c3e50" stroke-width="1"/>
+  <text x="100" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#2c3e50">MCP</text>
+  
+  <rect x="140" y="305" width="60" height="20" rx="5" fill="white" stroke="#2c3e50" stroke-width="1"/>
+  <text x="170" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#2c3e50">Protocol</text>
+  
+  <!-- Arrows -->
+  <!-- CF to MCP -->
+  <path d="M 250 140 Q 275 140 300 140" stroke="#2c3e50" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="275" y="135" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">API Calls</text>
+  
+  <!-- MCP to AI -->
+  <path d="M 400 200 Q 400 225 150 250" stroke="#2c3e50" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="275" y="235" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">MCP Tools</text>
+  
+  <!-- AI to MCP -->
+  <path d="M 150 250 Q 150 225 400 200" stroke="#2c3e50" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="275" y="215" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">Requests</text>
+  
+  <!-- Arrow marker -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- Version info -->
+  <text x="300" y="380" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#7f8c8d">
+    Version 0.1.0 | Spring AI 1.1.0-M2 | Java 21
+  </text>
+</svg>
