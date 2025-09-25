@@ -1,0 +1,16 @@
+---
+applications:
+  - name: cloud-foundry-mcp-server
+    buildpacks:
+      - java_buildpack_offline
+    memory: 1G
+    random-route: true
+    instances: 1
+    path: target/cloud-foundry-mcp-0.1.0-SNAPSHOT.jar
+    env:
+      JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 21.+ } }'
+      CF_APIHOST: "YOUR_CF_API_ENDPOINT"
+      CF_USERNAME: "YOUR_CF_USERNAME"
+      CF_PASSWORD: "YOUR_CF_PASSWORD"
+      CF_ORG: "YOUR_CF_ORGANIZATION"
+      CF_SPACE: "YOUR_CF_SPACE"
