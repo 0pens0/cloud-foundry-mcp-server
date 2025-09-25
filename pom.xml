@@ -12,7 +12,7 @@
 
     <groupId>org.tanzu</groupId>
     <artifactId>cloud-foundry-mcp</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
 
     <name>MCP Server for Cloud Foundry</name>
     <description>Spring AI MCP server that enables interaction with a Cloud Foundry foundation</description>

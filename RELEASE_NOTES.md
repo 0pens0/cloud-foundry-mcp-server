@@ -1,6 +1,6 @@
 # Release Notes
 
-## Version 1.0.0 - Cloud Foundry MCP Server
+## Version 0.1.0 - Cloud Foundry MCP Server
 
 ### 🚀 Major Features
 
@@ -148,7 +148,7 @@ cf push cloud-foundry-mcp-server
 
 ### 🔄 Version History
 
-#### v1.0.0 (2025-09-25)
+#### v0.1.0 (2025-09-25)
 - Initial release
 - 31 Cloud Foundry tools
 - Spring AI 1.1.0-M2 integration
