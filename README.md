@@ -21,10 +21,14 @@ A comprehensive Model Context Protocol (MCP) server that provides AI-powered acc
 
 ## 🚀 Quick Start
 
-### Deployed Server
-The MCP server is deployed and running at: `https://cloud-foundry-mcp-server.apps.tp.penso.io`
+### Deploy the Server
+1. **Build and deploy** the MCP server to your Cloud Foundry foundation
+2. **Configure** your Cloud Foundry credentials in the manifest
+3. **Get the deployed URL** from `cf apps` command
 
 ### MCP Client Configuration
+Once deployed, configure your MCP client with the server URL:
+
 ```json
 {
   "mcpServers": {
@@ -32,12 +36,14 @@ The MCP server is deployed and running at: `https://cloud-foundry-mcp-server.app
       "disabled": false,
       "timeout": 60,
       "type": "sse",
-      "url": "https://cloud-foundry-mcp-server.apps.tp.penso.io/sse",
+      "url": "https://your-mcp-server.apps.your-cf-domain.com/sse",
       "autoApprove": []
     }
   }
 }
 ```
+
+**Replace** `your-mcp-server.apps.your-cf-domain.com` with your actual deployed server URL.
 
 ## 🛠 Building & Deployment
 
@@ -52,6 +58,10 @@ The MCP server is deployed and running at: `https://cloud-foundry-mcp-server.app
 cp manifest-template.yml manifest.yml
 # Edit manifest.yml with your CF credentials
 cf push cloud-foundry-mcp-server
+
+# Get the deployed URL
+cf apps
+# Look for your app and copy the URL (e.g., https://cloud-foundry-mcp-server.apps.your-domain.com)
 ```
 
 ### Local Development
@@ -64,11 +74,11 @@ cf push cloud-foundry-mcp-server
 
 ### Environment Variables
 ```bash
-CF_APIHOST=api.sys.tp.penso.io
-CF_USERNAME=admin
+CF_APIHOST=api.your-cf-domain.com
+CF_USERNAME=your-username
 CF_PASSWORD=your-password
-CF_ORG=tanzu-platform-demo
-CF_SPACE=mcp-server
+CF_ORG=your-organization
+CF_SPACE=your-space
 ```
 
 ### Application Properties
@@ -142,8 +152,7 @@ This MCP server exposes **31 Cloud Foundry operations** as AI-powered tools:
 - **Java Version**: 21
 - **Transport**: SSE (Server-Sent Events)
 - **Health Endpoint**: `/actuator/health`
-- **Default Org**: `tanzu-platform-demo`
-- **Default Space**: `mcp-server`
+- **Configuration**: Environment variable-based CF credentials
 
 ## 📊 Health Status
 
