@@ -1,80 +1,164 @@
 # Cloud Foundry MCP Server
 
-This MCP Server provides an LLM interface for interacting with your Cloud Foundry foundation. It was built with the [Spring AI MCP Server Boot Starter](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html).
+A comprehensive Model Context Protocol (MCP) server that provides AI-powered access to Cloud Foundry operations through 31 specialized tools. Built with [Spring AI 1.1.0-M2](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html) and deployed on Cloud Foundry.
 
 ![Sample](images/sample.png)
 
-## Building the Server
+## 🚀 Quick Start
 
-```bash
-./mvnw clean package
-```
+### Deployed Server
+The MCP server is deployed and running at: `https://cloud-foundry-mcp-server.apps.tp.penso.io`
 
-### Using with MCP Client
-
-By default, this MCP server runs with the SSE transport. Configure your MCP client like this:
-
+### MCP Client Configuration
 ```json
 {
   "mcpServers": {
     "cloud-foundry": {
-      "url": "https://[URL for deployed CF MCP server]/sse",
-      "env": {
-        "CF_APIHOST": "[Your CF API Endpoint e.g. api.sys.mycf.com]",
-        "CF_USERNAME": "[Your CF User]",
-        "CF_PASSWORD": "[Your CF Password]",
-        "CF_ORG": "[Your Org]",
-        "CF_SPACE": "[Your Space]"
-      }
+      "disabled": false,
+      "timeout": 60,
+      "type": "sse",
+      "url": "https://cloud-foundry-mcp-server.apps.tp.penso.io/sse",
+      "autoApprove": []
     }
   }
 }
 ```
 
-## Capabilities
+## 🛠 Building & Deployment
 
-This MCP server exposes the following Cloud Foundry operations as tools:
+### Build the Server
+```bash
+./mvnw clean package -DskipTests
+```
+
+### Deploy to Cloud Foundry
+```bash
+cf push cloud-foundry-mcp-server
+```
+
+### Local Development
+```bash
+# Run with local profile
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+## ⚙️ Configuration
+
+### Environment Variables
+```bash
+CF_APIHOST=api.sys.tp.penso.io
+CF_USERNAME=admin
+CF_PASSWORD=your-password
+CF_ORG=tanzu-platform-demo
+CF_SPACE=mcp-server
+```
+
+### Application Properties
+```properties
+spring.ai.mcp.server.name=cloud-foundry-mcp
+spring.ai.mcp.server.version=1.0.0
+spring.ai.mcp.server.prompt-change-notification=false
+spring.ai.mcp.server.resource-change-notification=false
+
+management.endpoints.web.exposure.include=health,info,mappings
+management.endpoint.health.show-details=always
+
+logging.level.io.modelcontextprotocol=DEBUG
+logging.level.org.springframework.ai.mcp=DEBUG
+```
+
+## 🛠 Capabilities
+
+This MCP server exposes **31 Cloud Foundry operations** as AI-powered tools:
 
 ### Application Management (8 tools)
-- **applicationsList** - List all applications in a space
-- **applicationDetails** - Get detailed information about a specific application
-- **cloneApplication** - Clone an existing application
-- **scaleApplication** - Scale application instances, memory, or disk quota
-- **startApplication** - Start a stopped application
-- **stopApplication** - Stop a running application
-- **restartApplication** - Restart an application
-- **deleteApplication** - Delete an application
+- **applicationsList** - List applications in a CF space
+- **applicationDetails** - Get detailed app information
+- **pushApplication** - Deploy JAR files to CF
+- **scaleApplication** - Scale app instances, memory, disk
+- **startApplication** - Start CF applications
+- **stopApplication** - Stop running applications
+- **restartApplication** - Restart applications
+- **deleteApplication** - Delete applications
 
-### Organization & Space Management (7 tools)
+### Organization & Space Management (8 tools)
 - **organizationsList** - List all organizations
-- **organizationDetails** - Get details about a specific organization
-- **spacesList** - List all spaces in an organization
-- **getSpaceQuota** - Get quota information for a space
-- **createSpace** - Create a new space
-- **deleteSpace** - Delete a space
-- **renameSpace** - Rename an existing space
+- **organizationDetails** - Get org details
+- **spacesList** - List spaces in an org
+- **getSpaceQuota** - Get space quota details
+- **createSpace** - Create new spaces
+- **deleteSpace** - Delete spaces
+- **renameSpace** - Rename spaces
+- **deleteOrphanedRoutes** - Clean up orphaned routes
 
 ### Service Management (6 tools)
-- **serviceInstancesList** - List all service instances in a space
-- **serviceInstanceDetails** - Get details about a specific service instance
-- **serviceOfferingsList** - List available service offerings
-- **bindServiceInstance** - Bind a service instance to an application
-- **unbindServiceInstance** - Unbind a service instance from an application
-- **deleteServiceInstance** - Delete a service instance
+- **serviceInstancesList** - List service instances
+- **serviceInstanceDetails** - Get service instance details
+- **serviceOfferingsList** - List marketplace services
+- **bindServiceInstance** - Bind services to apps
+- **unbindServiceInstance** - Unbind services from apps
+- **deleteServiceInstance** - Delete service instances
 
 ### Route Management (6 tools)
-- **routesList** - List all routes in a space
-- **createRoute** - Create a new route
-- **deleteRoute** - Delete a specific route
-- **deleteOrphanedRoutes** - Delete all unmapped routes
-- **mapRoute** - Map a route to an application
-- **unmapRoute** - Unmap a route from an application
+- **routesList** - List routes in a space
+- **createRoute** - Create new routes
+- **deleteRoute** - Delete routes
+- **mapRoute** - Map routes to applications
+- **unmapRoute** - Unmap routes from applications
+- **deleteOrphanedRoutes** - Clean up orphaned routes
 
 ### Network Policy Management (3 tools)
-- **addNetworkPolicy** - Create network policy between applications
-- **listNetworkPolicies** - List all network policies
-- **removeNetworkPolicy** - Remove network policy between applications
+- **addNetworkPolicy** - Add network policies between apps
+- **listNetworkPolicies** - List network policies
+- **removeNetworkPolicy** - Remove network policies
 
 ### Application Cloning (1 tool)
+- **cloneApp** - Clone existing applications with buildpack consistency
 
-All tools support multi-context operations with optional `organization` and `space` parameters to target different environments.
+## 🔧 Technical Details
+
+- **Spring AI Version**: 1.1.0-M2
+- **Spring Boot Version**: 3.4.2
+- **Java Version**: 21
+- **Transport**: SSE (Server-Sent Events)
+- **Health Endpoint**: `/actuator/health`
+- **Default Org**: `tanzu-platform-demo`
+- **Default Space**: `mcp-server`
+
+## 📊 Health Status
+
+The server provides comprehensive health monitoring:
+- **Application Health**: Memory, disk, CPU usage
+- **SSL/TLS Status**: Certificate validation
+- **Cloud Foundry Connectivity**: API endpoint health
+- **MCP Server Status**: Tool registration and transport health
+
+## 🔒 Security
+
+- **Credential Management**: Environment variable-based configuration
+- **SSL/TLS**: HTTPS endpoints for secure communication
+- **Authentication**: Cloud Foundry UAA integration
+- **Authorization**: CF role-based access control
+
+## 📚 Documentation
+
+- **Release Notes**: [RELEASE_NOTES.md](RELEASE_NOTES.md)
+- **API Documentation**: Comprehensive tool descriptions
+- **Configuration Guide**: Setup and deployment instructions
+- **Troubleshooting**: Common issues and solutions
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+**Built with ❤️ using Spring AI and Cloud Foundry**

@@ -1,0 +1,12 @@
+cf:
+  apiHost: "api.sys.tp.penso.io"  # Replace with your actual CF API endpoint
+  username: "your-username"       # Replace with your CF username
+  password: "your-password"       # Replace with your CF password
+  organization: "your-org"        # Replace with your CF organization
+  space: "your-space"            # Replace with your CF space
+
+logging:
+  level:
+    org.tanzu.cfpulse: DEBUG
+    org.cloudfoundry: DEBUG
+    io.modelcontextprotocol: DEBUG

@@ -4,7 +4,13 @@ applications:
     buildpacks:
       - java_buildpack_offline
     memory: 1G
+    random-route: true
     instances: 1
     path: target/cloud-foundry-mcp-0.0.1-SNAPSHOT.jar
     env:
       JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 21.+ } }'
+      CF_APIHOST: "api.sys.tp.penso.io"
+      CF_USERNAME: "admin"
+      CF_PASSWORD: "GTAozU55zfFDp2vjG-z2w0rlEyV1xbPY"
+      CF_ORG: "tanzu-platform-demo"
+      CF_SPACE: "mcp-server"
