@@ -33,6 +33,9 @@ The MCP server is deployed and running at: `https://cloud-foundry-mcp-server.app
 
 ### Deploy to Cloud Foundry
 ```bash
+# Copy the template and configure with your credentials
+cp manifest-template.yml manifest.yml
+# Edit manifest.yml with your CF credentials
 cf push cloud-foundry-mcp-server
 ```
 
@@ -139,6 +142,15 @@ The server provides comprehensive health monitoring:
 - **SSL/TLS**: HTTPS endpoints for secure communication
 - **Authentication**: Cloud Foundry UAA integration
 - **Authorization**: CF role-based access control
+
+### 🔐 Credential Security
+
+**Important**: The `manifest.yml` file contains sensitive credentials and is excluded from git via `.gitignore`.
+
+- **Template**: Use `manifest-template.yml` as a starting point
+- **Local Configuration**: Copy template and add your credentials
+- **Environment Variables**: Credentials are passed via CF environment variables
+- **Never Commit**: Actual manifest files with credentials should never be committed to git
 
 ## 📚 Documentation
 

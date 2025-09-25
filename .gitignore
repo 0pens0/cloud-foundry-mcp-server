@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Cloud Foundry ###
+manifest.yml
+manifest-*.yml
+*.env
+.env
