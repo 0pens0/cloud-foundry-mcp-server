@@ -57,7 +57,7 @@
 - **Spring AI 1.1.0-M2** - Latest MCP server framework
 - **Spring Boot 3.4.2** - Modern Java framework
 - **Java 21** - Latest LTS Java version
-- **SSE Transport** - Server-Sent Events for real-time communication
+- **HTTP Streamable Transport** - Modern HTTP-based communication protocol
 - **Cloud Foundry Java Client** - Official CF operations library
 
 ### 🔧 Configuration
@@ -78,8 +78,8 @@ CF_SPACE=mcp-server
     "cloud-foundry": {
       "disabled": false,
       "timeout": 60,
-      "type": "sse",
-      "url": "https://cloud-foundry-mcp-server.apps.tp.penso.io/sse",
+      "type": "streamable",
+      "url": "https://cloud-foundry-mcp-server.apps.tp.penso.io/mcp",
       "autoApprove": []
     }
   }
@@ -105,7 +105,7 @@ cf push cloud-foundry-mcp-server
 
 ### 🏗 Architecture
 
-- **MCP Server**: Spring AI-based MCP server with SSE transport
+- **MCP Server**: Spring AI-based MCP server with HTTP Streamable transport
 - **Service Layer**: Modular services for different CF operations
 - **Configuration**: Environment-based CF credentials
 - **Health Checks**: Spring Boot Actuator health endpoints
@@ -152,7 +152,7 @@ cf push cloud-foundry-mcp-server
 - Initial release
 - 31 Cloud Foundry tools
 - Spring AI 1.1.0-M2 integration
-- SSE transport support
+- HTTP Streamable transport support
 - Cloud Foundry deployment ready
 - Comprehensive documentation
 

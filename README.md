@@ -7,7 +7,7 @@ A comprehensive Model Context Protocol (MCP) server that provides AI-powered acc
 ![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.2-brightgreen?style=for-the-badge&logo=springboot)
 ![MCP](https://img.shields.io/badge/MCP-Protocol-purple?style=for-the-badge)
-![SSE](https://img.shields.io/badge/Transport-SSE-yellow?style=for-the-badge)
+![Streamable](https://img.shields.io/badge/Transport-HTTP%20Streamable-blue?style=for-the-badge)
 
 ![Version](https://img.shields.io/badge/Version-0.1.0-red?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
@@ -35,8 +35,8 @@ Once deployed, configure your MCP client with the server URL:
     "cloud-foundry": {
       "disabled": false,
       "timeout": 60,
-      "type": "sse",
-      "url": "https://your-mcp-server.apps.your-cf-domain.com/sse",
+      "type": "streamable",
+      "url": "https://your-mcp-server.apps.your-cf-domain.com/mcp",
       "autoApprove": []
     }
   }
@@ -87,8 +87,7 @@ spring.ai.mcp.server.name=cloud-foundry-mcp
 spring.ai.mcp.server.version=0.1.0
 spring.ai.mcp.server.prompt-change-notification=false
 spring.ai.mcp.server.resource-change-notification=false
-spring.ai.mcp.server.transport.type=sse
-spring.ai.mcp.server.transport.sse.path=/sse
+spring.ai.mcp.server.protocol=streamable
 
 management.endpoints.web.exposure.include=health,info,mappings
 management.endpoint.health.show-details=always
@@ -150,7 +149,7 @@ This MCP server exposes **31 Cloud Foundry operations** as AI-powered tools:
 - **Spring AI Version**: 1.1.0-M2
 - **Spring Boot Version**: 3.4.2
 - **Java Version**: 21
-- **Transport**: SSE (Server-Sent Events)
+- **Transport**: HTTP Streamable
 - **Health Endpoint**: `/actuator/health`
 - **Configuration**: Environment variable-based CF credentials
 
