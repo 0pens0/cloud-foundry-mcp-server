@@ -1,6 +1,6 @@
 # Cloud Foundry MCP Server
 
-A comprehensive Model Context Protocol (MCP) server that provides AI-powered access to Cloud Foundry operations through 31 specialized tools. Built with [Spring AI 1.1.0-M2](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html) and deployed on Cloud Foundry.
+A comprehensive Model Context Protocol (MCP) server that provides AI-powered access to Cloud Foundry operations through 32 specialized tools. Built with [Spring AI 1.1.0-M2](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html) and deployed on Cloud Foundry.
 
 ![Cloud Foundry MCP Server](https://img.shields.io/badge/Cloud%20Foundry-MCP%20Server-blue?style=for-the-badge&logo=cloudfoundry)
 ![Spring AI](https://img.shields.io/badge/Spring%20AI-1.1.0--M2-green?style=for-the-badge&logo=spring)
@@ -98,7 +98,7 @@ logging.level.org.springframework.ai.mcp=DEBUG
 
 ## 🛠 Capabilities
 
-This MCP server exposes **31 Cloud Foundry operations** as AI-powered tools:
+This MCP server exposes **32 Cloud Foundry operations** as AI-powered tools:
 
 ### Application Management (8 tools)
 - **applicationsList** - List applications in a CF space
@@ -120,10 +120,11 @@ This MCP server exposes **31 Cloud Foundry operations** as AI-powered tools:
 - **renameSpace** - Rename spaces
 - **deleteOrphanedRoutes** - Clean up orphaned routes
 
-### Service Management (6 tools)
+### Service Management (7 tools)
 - **serviceInstancesList** - List service instances
 - **serviceInstanceDetails** - Get service instance details
 - **serviceOfferingsList** - List marketplace services
+- **createServiceInstance** - Create new service instances
 - **bindServiceInstance** - Bind services to apps
 - **unbindServiceInstance** - Unbind services from apps
 - **deleteServiceInstance** - Delete service instances
@@ -160,6 +161,23 @@ The server provides comprehensive health monitoring:
 - **SSL/TLS Status**: Certificate validation
 - **Cloud Foundry Connectivity**: API endpoint health
 - **MCP Server Status**: Tool registration and transport health
+
+## 🚀 Current Deployment
+
+**Status**: ✅ Successfully Deployed and Running
+
+**URL**: `https://cloud-foundry-mcp-courteous-lemur-hd.apps.tp.penso.io`
+
+**Organization**: `tanzu-platform-demo`  
+**Space**: `mcp-server`  
+**Application**: `cloud-foundry-mcp`
+
+### Recent Fixes (v0.1.0)
+- ✅ **Fixed critical service instance creation** - Added missing `createServiceInstance` method
+- ✅ **Improved application push handling** - Fixed hardcoded parameter issues
+- ✅ **Enhanced error handling** - Better validation and parameter processing
+- ✅ **Verified all 32 tools** - Comprehensive testing of all MCP operations
+- ✅ **Successful deployment** - Application running and healthy on Cloud Foundry
 
 ## 🔒 Security
 

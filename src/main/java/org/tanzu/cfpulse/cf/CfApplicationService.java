@@ -54,14 +54,22 @@ public class CfApplicationService extends CfBaseService {
                                 @ToolParam(description = DISK_PARAM, required = false) Integer disk,
                                 @ToolParam(description = ORG_PARAM, required = false) String organization,
                                 @ToolParam(description = SPACE_PARAM, required = false) String space) {
-        PushApplicationRequest request = PushApplicationRequest.builder().
-                name(applicationName).
-                path(Paths.get(path)).
-                noStart(true).
-                buildpack("java_buildpack_offline").
-                memory(memory).
-                diskQuota(disk).
-                build();
+        PushApplicationRequest.Builder builder = PushApplicationRequest.builder()
+                .name(applicationName)
+                .path(Paths.get(path))
+                .buildpack("java_buildpack_offline");
+        
+        if (noStart != null) {
+            builder.noStart(noStart);
+        }
+        if (memory != null) {
+            builder.memory(memory);
+        }
+        if (disk != null) {
+            builder.diskQuota(disk);
+        }
+        
+        PushApplicationRequest request = builder.build();
         var operations = getOperations(organization, space);
         operations.applications().push(request).block();
 

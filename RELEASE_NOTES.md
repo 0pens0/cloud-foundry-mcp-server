@@ -4,7 +4,7 @@
 
 ### 🚀 Major Features
 
-**Cloud Foundry MCP Server** - A comprehensive Model Context Protocol (MCP) server that provides AI-powered access to Cloud Foundry operations through 31 specialized tools.
+**Cloud Foundry MCP Server** - A comprehensive Model Context Protocol (MCP) server that provides AI-powered access to Cloud Foundry operations through 32 specialized tools.
 
 ### ✨ Key Capabilities
 
@@ -28,10 +28,11 @@
 - **renameSpace** - Rename spaces
 - **deleteOrphanedRoutes** - Clean up orphaned routes
 
-#### Service Management (6 tools)
+#### Service Management (7 tools)
 - **serviceInstancesList** - List service instances
 - **serviceInstanceDetails** - Get service instance details
 - **serviceOfferingsList** - List marketplace services
+- **createServiceInstance** - Create new service instances
 - **bindServiceInstance** - Bind services to apps
 - **unbindServiceInstance** - Unbind services from apps
 - **deleteServiceInstance** - Delete service instances
@@ -148,13 +149,16 @@ cf push cloud-foundry-mcp-server
 
 ### 🔄 Version History
 
-#### v0.1.0 (2025-09-25)
+#### v0.1.0 (2025-09-26)
 - Initial release
-- 31 Cloud Foundry tools
+- 32 Cloud Foundry tools
 - Spring AI 1.1.0-M2 integration
 - HTTP Streamable transport support
 - Cloud Foundry deployment ready
 - Comprehensive documentation
+- Fixed critical service instance creation issue
+- Improved application push parameter handling
+- Enhanced error handling and validation
 
 ### 🤝 Contributing
 
