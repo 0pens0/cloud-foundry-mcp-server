@@ -98,7 +98,7 @@ logging.level.org.springframework.ai.mcp=DEBUG
 
 ## 🛠 Capabilities
 
-This MCP server exposes **32 Cloud Foundry operations** as AI-powered tools:
+This MCP server exposes **35 Cloud Foundry operations** as AI-powered tools:
 
 ### Application Management (8 tools)
 - **applicationsList** - List applications in a CF space
@@ -144,6 +144,11 @@ This MCP server exposes **32 Cloud Foundry operations** as AI-powered tools:
 
 ### Application Cloning (1 tool)
 - **cloneApp** - Clone existing applications with buildpack consistency
+
+### Target Management (3 tools)
+- **targetCf** - Set the target organization and space for CF operations
+- **getCurrentTarget** - Get the current target organization and space
+- **clearTarget** - Clear the current target, reverting to configuration defaults
 
 ## 🔧 Technical Details
 

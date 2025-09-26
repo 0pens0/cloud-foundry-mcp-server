@@ -1,8 +1,5 @@
 package org.tanzu.cfpulse.cf;
 
-import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.doppler.DopplerClient;
-import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.DefaultConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -10,8 +7,6 @@ import org.cloudfoundry.reactor.client.ReactorCloudFoundryClient;
 import org.cloudfoundry.reactor.doppler.ReactorDopplerClient;
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
-import org.cloudfoundry.uaa.UaaClient;
-import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.reactor.networking.ReactorNetworkingClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,0 +1,122 @@
+[
+  {
+    "id": "D09FBTKUF36",
+    "name": "@cursormcp",
+    "topic": "",
+    "purpose": "DM with cursor-mcp",
+    "memberCount": 2,
+    "mpim": false,
+    "im": true,
+    "private": false
+  },
+  {
+    "id": "D09F7GJ7M8W",
+    "name": "@cursor",
+    "topic": "",
+    "purpose": "DM with Cursor",
+    "memberCount": 2,
+    "mpim": false,
+    "im": true,
+    "private": false
+  },
+  {
+    "id": "D09F3HWKC75",
+    "name": "@oren",
+    "topic": "",
+    "purpose": "DM with Oren Penso",
+    "memberCount": 2,
+    "mpim": false,
+    "im": true,
+    "private": false
+  },
+  {
+    "id": "D09F3HWKBFV",
+    "name": "@slackbot",
+    "topic": "",
+    "purpose": "DM with Slackbot",
+    "memberCount": 2,
+    "mpim": false,
+    "im": true,
+    "private": false
+  },
+  {
+    "id": "D09F3HWKC75",
+    "name": "@oren",
+    "topic": "",
+    "purpose": "DM with Oren Penso",
+    "memberCount": 2,
+    "mpim": false,
+    "im": true,
+    "private": false
+  },
+  {
+    "id": "D09F3HWKBFV",
+    "name": "@slackbot",
+    "topic": "",
+    "purpose": "DM with Slackbot",
+    "memberCount": 2,
+    "mpim": false,
+    "im": true,
+    "private": false
+  },
+  {
+    "id": "C09F3HWP119",
+    "name": "#all-penso",
+    "topic": "",
+    "purpose": "Share announcements and updates about company news, upcoming events or teammates who deserve some kudos. ⭐",
+    "memberCount": 1,
+    "mpim": false,
+    "im": false,
+    "private": false
+  },
+  {
+    "id": "C09F3HWP2D9",
+    "name": "#social",
+    "topic": "",
+    "purpose": "Other channels are for work. This one’s just for fun. Get to know your teammates and show your lighter side. 🎈",
+    "memberCount": 1,
+    "mpim": false,
+    "im": false,
+    "private": false
+  },
+  {
+    "id": "C09F4MFKE93",
+    "name": "#new-channel",
+    "topic": "",
+    "purpose": "This channel is for everything #new-channel. Hold meetings, share docs and make decisions together with your team.",
+    "memberCount": 1,
+    "mpim": false,
+    "im": false,
+    "private": false
+  },
+  {
+    "id": "C09FBNL9NA0",
+    "name": "#ai-tool-chat",
+    "topic": "",
+    "purpose": "",
+    "memberCount": 1,
+    "mpim": false,
+    "im": false,
+    "private": false
+  },
+  {
+    "id": "D09FBTKUF36",
+    "name": "@cursormcp",
+    "topic": "",
+    "purpose": "DM with cursor-mcp",
+    "memberCount": 2,
+    "mpim": false,
+    "im": true,
+    "private": false
+  },
+  {
+    "id": "D09F7GJ7M8W",
+    "name": "@cursor",
+    "topic": "",
+    "purpose": "DM with Cursor",
+    "memberCount": 2,
+    "mpim": false,
+    "im": true,
+    "private": false
+  }
+]

@@ -23,24 +23,28 @@ public class CloudFoundryOperationsFactory {
     private final DopplerClient dopplerClient;
     private final UaaClient uaaClient;
     private final NetworkingClient networkingClient;
-    private final String defaultOrganization;
-    private final String defaultSpace;
+    private final String configDefaultOrganization;
+    private final String configDefaultSpace;
     
     private final ConcurrentHashMap<String, CloudFoundryOperations> operationsCache;
     private volatile CloudFoundryOperations defaultOperations;
+    
+    // Dynamic target that can be set at runtime
+    private volatile String currentTargetOrganization;
+    private volatile String currentTargetSpace;
 
     public CloudFoundryOperationsFactory(CloudFoundryClient cloudFoundryClient,
                                        DopplerClient dopplerClient,
                                        UaaClient uaaClient,
                                        NetworkingClient networkingClient,
-                                       @Value("${cf.organization}") String defaultOrganization,
-                                       @Value("${cf.space}") String defaultSpace) {
+                                       @Value("${cf.organization}") String configDefaultOrganization,
+                                       @Value("${cf.space}") String configDefaultSpace) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.dopplerClient = dopplerClient;
         this.uaaClient = uaaClient;
         this.networkingClient = networkingClient;
-        this.defaultOrganization = defaultOrganization;
-        this.defaultSpace = defaultSpace;
+        this.configDefaultOrganization = configDefaultOrganization;
+        this.configDefaultSpace = configDefaultSpace;
         this.operationsCache = new ConcurrentHashMap<>();
     }
 
@@ -48,9 +52,10 @@ public class CloudFoundryOperationsFactory {
         if (defaultOperations == null) {
             synchronized (this) {
                 if (defaultOperations == null) {
-                    logger.debug("Creating default CloudFoundryOperations for org={}, space={}", 
-                               defaultOrganization, defaultSpace);
-                    defaultOperations = createOperations(defaultOrganization, defaultSpace);
+                    String org = getCurrentOrganization();
+                    String space = getCurrentSpace();
+                    logger.debug("Creating default CloudFoundryOperations for org={}, space={}", org, space);
+                    defaultOperations = createOperations(org, space);
                 }
             }
         }
@@ -58,10 +63,10 @@ public class CloudFoundryOperationsFactory {
     }
 
     public CloudFoundryOperations getOperations(String organization, String space) {
-        String resolvedOrg = organization != null ? organization : defaultOrganization;
-        String resolvedSpace = space != null ? space : defaultSpace;
+        String resolvedOrg = organization != null ? organization : getCurrentOrganization();
+        String resolvedSpace = space != null ? space : getCurrentSpace();
         
-        if (resolvedOrg.equals(defaultOrganization) && resolvedSpace.equals(defaultSpace)) {
+        if (resolvedOrg.equals(getCurrentOrganization()) && resolvedSpace.equals(getCurrentSpace())) {
             return getDefaultOperations();
         }
         
@@ -90,7 +95,54 @@ public class CloudFoundryOperationsFactory {
     }
 
     public String getDefaultSpace() {
-        return defaultSpace;
+        return getCurrentSpace();
+    }
+
+    public String getDefaultOrganization() {
+        return getCurrentOrganization();
+    }
+
+    /**
+     * Set the current target organization and space.
+     * This will invalidate the default operations cache.
+     */
+    public void setDefaultTarget(String organization, String space) {
+        logger.info("Setting default target: org={}, space={}", organization, space);
+        this.currentTargetOrganization = organization;
+        this.currentTargetSpace = space;
+        
+        // Invalidate the default operations cache
+        synchronized (this) {
+            this.defaultOperations = null;
+        }
+    }
+
+    /**
+     * Clear the current target, reverting to configuration defaults.
+     */
+    public void clearDefaultTarget() {
+        logger.info("Clearing default target, reverting to configuration defaults");
+        this.currentTargetOrganization = null;
+        this.currentTargetSpace = null;
+        
+        // Invalidate the default operations cache
+        synchronized (this) {
+            this.defaultOperations = null;
+        }
+    }
+
+    /**
+     * Get the current organization (dynamic target or config default).
+     */
+    private String getCurrentOrganization() {
+        return currentTargetOrganization != null ? currentTargetOrganization : configDefaultOrganization;
+    }
+
+    /**
+     * Get the current space (dynamic target or config default).
+     */
+    private String getCurrentSpace() {
+        return currentTargetSpace != null ? currentTargetSpace : configDefaultSpace;
     }
 
     private CloudFoundryOperations createOperations(String organization, String space) {

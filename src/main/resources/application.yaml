@@ -4,3 +4,5 @@ cf:
   password: ${vcap.services.cf-client.credentials.password:${CF_PASSWORD:}}
   organization: ${vcap.services.cf-client.credentials.org:${CF_ORG}}
   space: ${vcap.services.cf-client.credentials.space:${CF_SPACE}}
+  buildpack: ${CF_BUILDPACK:java_buildpack_offline}
+  javaVersion: ${CF_JAVA_VERSION:17.+}

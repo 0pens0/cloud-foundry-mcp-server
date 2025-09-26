@@ -1,5 +1,7 @@
 package org.tanzu.cfpulse.clone;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ import java.time.Duration;
  */
 @Service
 public class CfApplicationCloner extends CfBaseService {
+
+    private static final Logger logger = LoggerFactory.getLogger(CfApplicationCloner.class);
 
     private final ApplicationConfigService configService;
     private final BuildpackPlaceholderGenerator placeholderGenerator;
@@ -46,7 +50,7 @@ public class CfApplicationCloner extends CfBaseService {
             @ToolParam(description = "Organization name (optional)", required = false) String organization,
             @ToolParam(description = "Space name (optional)", required = false) String space) {
         
-        System.out.println("Starting clone operation: " + sourceApp + " -> " + targetApp);
+        logger.info("Starting clone operation: {} -> {}", sourceApp, targetApp);
         
         try {
             // First get both source app config AND buildpack info
@@ -58,24 +62,23 @@ public class CfApplicationCloner extends CfBaseService {
                         ApplicationConfigService.AppConfig config = tuple.getT1();
                         String sourceBuildpack = tuple.getT2();
                         
-                        System.out.println("Retrieved source app info: memory=" + config.memoryLimit() + 
-                                         ", disk=" + config.diskQuota() + ", instances=" + config.instances() +
-                                         ", buildpack=" + sourceBuildpack + 
-                                         ", env vars=" + config.environmentVariables().size());
+                        logger.debug("Retrieved source app info: memory={}, disk={}, instances={}, buildpack={}, env vars={}", 
+                                   config.memoryLimit(), config.diskQuota(), config.instances(), 
+                                   sourceBuildpack, config.environmentVariables().size());
                         
                         return Mono.fromCallable(() -> placeholderGenerator.createPlaceholder(targetApp, sourceBuildpack))
                                 .flatMap(placeholderPath -> {
-                                    System.out.println("Created buildpack placeholder for: " + sourceBuildpack);
+                                    logger.debug("Created buildpack placeholder for: {}", sourceBuildpack);
                                     
                                     return deploymentService.deployPlaceholderWithSourceBuildpack(targetApp, placeholderPath, sourceBuildpack, organization, space, config)
-                                            .doOnSuccess(v -> System.out.println("Placeholder deployed with matching buildpack: " + sourceBuildpack))
+                                            .doOnSuccess(v -> logger.debug("Placeholder deployed with matching buildpack: {}", sourceBuildpack))
                                             .then(
                                                     // Step 2: Copy application source (buildpack already matches)
                                                     deploymentService.copySourceWithBuildpackVerification(sourceApp, targetApp, sourceBuildpack, organization, space, config)
-                                                            .doOnSuccess(v -> System.out.println("Source copy completed with buildpack verification"))
+                                                            .doOnSuccess(v -> logger.debug("Source copy completed with buildpack verification"))
                                             )
                                             .doFinally(signal -> {
-                                                System.out.println("Cleaning up temporary files...");
+                                                logger.debug("Cleaning up temporary files...");
                                                 deploymentService.cleanup(placeholderPath);
                                             });
                                 });
@@ -83,11 +86,10 @@ public class CfApplicationCloner extends CfBaseService {
                     .timeout(Duration.ofMinutes(10)) // 10 minute timeout for the entire operation
                     .block(); // Block to make it synchronous for MCP
             
-            System.out.println("Clone operation completed successfully: " + sourceApp + " -> " + targetApp);
+            logger.info("Clone operation completed successfully: {} -> {}", sourceApp, targetApp);
             
         } catch (Exception e) {
-            System.err.println("Clone operation failed: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Clone operation failed: {} -> {}", sourceApp, targetApp, e);
             throw new RuntimeException("Failed to clone application: " + sourceApp + " -> " + targetApp, e);
         }
     }
