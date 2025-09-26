@@ -81,6 +81,13 @@ CF_ORG=your-organization
 CF_SPACE=your-space
 ```
 
+### Configuration Validation
+The server includes automatic configuration validation on startup:
+- **Required**: API host, username, and password must be configured
+- **Optional**: Organization and space (warnings if not set)
+- **Startup Check**: Validates CF connectivity and credentials
+- **Error Handling**: Fails fast with clear error messages if configuration is invalid
+
 ### Application Properties
 ```properties
 spring.ai.mcp.server.name=cloud-foundry-mcp
@@ -98,7 +105,7 @@ logging.level.org.springframework.ai.mcp=DEBUG
 
 ## 🛠 Capabilities
 
-This MCP server exposes **35 Cloud Foundry operations** as AI-powered tools:
+This MCP server exposes **38 Cloud Foundry operations** as AI-powered tools:
 
 ### Application Management (8 tools)
 - **applicationsList** - List applications in a CF space
@@ -150,6 +157,9 @@ This MCP server exposes **35 Cloud Foundry operations** as AI-powered tools:
 - **getCurrentTarget** - Get the current target organization and space
 - **clearTarget** - Clear the current target, reverting to configuration defaults
 
+### Configuration & Validation (1 tool)
+- **CfConfigurationValidator** - Validates Cloud Foundry configuration on startup
+
 ## 🔧 Technical Details
 
 - **Spring AI Version**: 1.1.0-M2
@@ -177,11 +187,14 @@ The server provides comprehensive health monitoring:
 **Space**: `mcp-server`  
 **Application**: `cloud-foundry-mcp`
 
-### Recent Fixes (v0.1.0)
+### Recent Updates (v0.1.0)
+- ✅ **Added Target Management Tools** - New `targetCf`, `getCurrentTarget`, and `clearTarget` operations
+- ✅ **Configuration Validation** - Added startup validation for CF credentials and settings
+- ✅ **Enhanced Error Handling** - Better validation and parameter processing
+- ✅ **Comprehensive Testing** - Added unit tests for all new services
 - ✅ **Fixed critical service instance creation** - Added missing `createServiceInstance` method
 - ✅ **Improved application push handling** - Fixed hardcoded parameter issues
-- ✅ **Enhanced error handling** - Better validation and parameter processing
-- ✅ **Verified all 32 tools** - Comprehensive testing of all MCP operations
+- ✅ **Verified all 38 tools** - Comprehensive testing of all MCP operations
 - ✅ **Successful deployment** - Application running and healthy on Cloud Foundry
 
 ## 🔒 Security
