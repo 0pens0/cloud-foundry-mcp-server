@@ -27,7 +27,7 @@ public class CfSpaceService extends CfBaseService {
     private static final String NEW_SPACE_NAME_PARAM = "New name for the Cloud Foundry space";
 
     public CfSpaceService(CloudFoundryOperationsFactory operationsFactory) {
-        super(operationsFactory);
+        super(operationsFactory, 3, 2);
     }
 
     @Tool(description = SPACE_LIST)

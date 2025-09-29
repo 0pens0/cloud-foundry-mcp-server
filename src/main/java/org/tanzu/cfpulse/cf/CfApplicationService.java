@@ -40,7 +40,7 @@ public class CfApplicationService extends CfBaseService {
     public CfApplicationService(CloudFoundryOperationsFactory operationsFactory,
                                @Value("${cf.buildpack:java_buildpack_offline}") String defaultBuildpack,
                                @Value("${cf.javaVersion:17.+}") String defaultJavaVersion) {
-        super(operationsFactory);
+        super(operationsFactory, 3, 2);
         this.defaultBuildpack = defaultBuildpack;
         this.defaultJavaVersion = defaultJavaVersion;
     }

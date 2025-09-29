@@ -23,7 +23,7 @@ public class CfNetworkPolicyService extends CfBaseService {
     private static final String PORTS_PARAM = "Port or port range for the policy (e.g., '8080' or '8080-8090')";
 
     public CfNetworkPolicyService(CloudFoundryOperationsFactory operationsFactory) {
-        super(operationsFactory);
+        super(operationsFactory, 3, 2);
     }
 
     @Tool(description = ADD_NETWORK_POLICY)

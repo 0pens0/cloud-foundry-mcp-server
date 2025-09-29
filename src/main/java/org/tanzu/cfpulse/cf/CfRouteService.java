@@ -24,7 +24,7 @@ public class CfRouteService extends CfBaseService {
     private static final String PORT_PARAM = "The port for the route (optional)";
 
     public CfRouteService(CloudFoundryOperationsFactory operationsFactory) {
-        super(operationsFactory);
+        super(operationsFactory, 3, 2);
     }
 
     @Tool(description = ROUTE_LIST)

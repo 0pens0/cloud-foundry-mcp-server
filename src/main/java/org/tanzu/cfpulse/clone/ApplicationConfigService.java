@@ -19,7 +19,7 @@ import java.util.Map;
 public class ApplicationConfigService extends CfBaseService {
 
     public ApplicationConfigService(CloudFoundryOperationsFactory operationsFactory) {
-        super(operationsFactory);
+        super(operationsFactory, 3, 2);
     }
 
     /**

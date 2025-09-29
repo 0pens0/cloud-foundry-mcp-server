@@ -23,7 +23,7 @@ public class CfServiceInstanceService extends CfBaseService {
     private static final String SERVICE_OFFERING_PARAM = "Name of the service offering for the service instance";
 
     public CfServiceInstanceService(CloudFoundryOperationsFactory operationsFactory) {
-        super(operationsFactory);
+        super(operationsFactory, 3, 2);
     }
 
     @Tool(description = SERVICE_INSTANCE_LIST)

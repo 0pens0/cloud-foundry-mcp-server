@@ -21,7 +21,7 @@ public class ApplicationDeploymentService extends CfBaseService {
     private final ApplicationConfigService configService;
 
     public ApplicationDeploymentService(CloudFoundryOperationsFactory operationsFactory, ApplicationConfigService configService) {
-        super(operationsFactory);
+        super(operationsFactory, 3, 2);
         this.configService = configService;
     }
 

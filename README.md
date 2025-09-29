@@ -34,7 +34,7 @@ Once deployed, configure your MCP client with the server URL:
   "mcpServers": {
     "cloud-foundry": {
       "disabled": false,
-      "timeout": 60,
+      "timeout": 300,
       "type": "streamable",
       "url": "https://your-mcp-server.apps.your-cf-domain.com/mcp",
       "autoApprove": []
@@ -101,6 +101,19 @@ management.endpoint.health.show-details=always
 
 logging.level.io.modelcontextprotocol=DEBUG
 logging.level.org.springframework.ai.mcp=DEBUG
+
+# Cloud Foundry Connection Settings
+cf.connection.poolSize=20
+cf.connection.keepAlive=true
+cf.connection.timeout=30
+cf.connection.readTimeout=60
+
+# Cloud Foundry Retry Settings
+cf.retry.maxAttempts=3
+cf.retry.delay=2
+
+# Cloud Foundry Token Refresh Settings (Note: PasswordGrantTokenProvider handles refresh automatically)
+# cf.token.refreshThreshold=5
 ```
 
 ## 🛠 Capabilities
@@ -174,8 +187,11 @@ This MCP server exposes **38 Cloud Foundry operations** as AI-powered tools:
 The server provides comprehensive health monitoring:
 - **Application Health**: Memory, disk, CPU usage
 - **SSL/TLS Status**: Certificate validation
-- **Cloud Foundry Connectivity**: API endpoint health
+- **Cloud Foundry Connectivity**: API endpoint health with automatic retry logic
 - **MCP Server Status**: Tool registration and transport health
+- **Connection Pooling**: Optimized connection management with keep-alive
+- **Token Management**: Automatic UAA token handling to prevent session expiry
+- **Retry Logic**: Automatic retry for transient network failures
 
 ## 🚀 Current Deployment
 

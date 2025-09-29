@@ -34,7 +34,7 @@ public class CfApplicationCloner extends CfBaseService {
                               ApplicationConfigService configService,
                               BuildpackPlaceholderGenerator placeholderGenerator,
                               ApplicationDeploymentService deploymentService) {
-        super(operationsFactory);
+        super(operationsFactory, 3, 2);
         this.configService = configService;
         this.placeholderGenerator = placeholderGenerator;
         this.deploymentService = deploymentService;

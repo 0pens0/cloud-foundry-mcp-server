@@ -16,7 +16,7 @@ public class CfTargetService extends CfBaseService {
     private static final Logger logger = LoggerFactory.getLogger(CfTargetService.class);
 
     public CfTargetService(CloudFoundryOperationsFactory operationsFactory) {
-        super(operationsFactory);
+        super(operationsFactory, 3, 2);
     }
 
     /**

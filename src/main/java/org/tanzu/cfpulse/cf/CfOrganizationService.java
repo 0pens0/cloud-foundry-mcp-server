@@ -17,7 +17,7 @@ public class CfOrganizationService extends CfBaseService {
     private static final String ORG_NAME_PARAM = "Name of the Cloud Foundry organization";
 
     public CfOrganizationService(CloudFoundryOperationsFactory operationsFactory) {
-        super(operationsFactory);
+        super(operationsFactory, 3, 2);
     }
 
     @Tool(description = ORGANIZATION_LIST)
